@@ -1,8 +1,9 @@
 import { neon } from "@neondatabase/serverless";
 
 function client() {
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error("DATABASE_URL is not set");
+  // Vercel's Neon integration prefixes names (here STORAGE_), so accept both.
+  const url = process.env.STORAGE_DATABASE_URL ?? process.env.DATABASE_URL;
+  if (!url) throw new Error("STORAGE_DATABASE_URL is not set");
   return neon(url);
 }
 

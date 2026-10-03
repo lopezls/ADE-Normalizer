@@ -79,6 +79,8 @@ export async function submitEncounter(
     };
   } catch (err) {
     console.error("submitEncounter failed", err);
+    if (err instanceof Error && err.message.endsWith("is not set"))
+      return { status: "error", message: `Server misconfigured: ${err.message}.` };
     return { status: "error", message: "Could not save the encounter. Please try again." };
   }
 }

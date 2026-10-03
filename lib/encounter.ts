@@ -42,6 +42,20 @@ export function formatSummary(
     `Indication: ${e.indication}`,
     `Medication list changes: ${e.medChanges ? `Yes - ${dash(e.medChangesDetails)}` : "No"}`,
     `Events reported by patient: ${dash(e.eventsReported)}`,
+    `ADEs (parsed): ${parseAdes(e.eventsReported) || "None"}`,
     `Interventions provided: ${dash(e.interventions)}`,
   ].join("\n");
+}
+
+/**
+ * Splits the events field on "-" (or new lines), then normalizes each ADE:
+ * lowercase, letters/digits only (no spaces). Duplicates dropped, order kept.
+ * Returned dash-joined, e.g. "Nausea - Hair loss" -> "nausea-hairloss".
+ */
+export function parseAdes(raw: string) {
+  const ades = raw
+    .split(/[-\n]/)
+    .map((s) => s.toLowerCase().replace(/[^a-z0-9]/g, ""))
+    .filter(Boolean);
+  return [...new Set(ades)].join("-");
 }

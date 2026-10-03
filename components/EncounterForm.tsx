@@ -127,9 +127,12 @@ export default function EncounterForm() {
             id="eventsReported"
             name="eventsReported"
             rows={4}
-            placeholder="e.g. Diarrhea x3 days, ~4 episodes/day"
+            placeholder="e.g. Diarrhea - Hair loss - Injection site redness"
             className={field}
           />
+          <p className="mt-1 text-xs text-zinc-500">
+            Separate each event with a dash (-). Saved as lowercase with no spaces, e.g. diarrhea-hairloss.
+          </p>
         </div>
 
         <div>

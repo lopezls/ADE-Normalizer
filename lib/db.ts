@@ -31,6 +31,8 @@ export function ensureSchema() {
         interventions TEXT NOT NULL DEFAULT '',
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )`;
+    // Added after first deploy; existing rows get ''.
+    await sql`ALTER TABLE encounters ADD COLUMN IF NOT EXISTS ades TEXT NOT NULL DEFAULT ''`;
   })().catch((e) => {
     schemaReady = null;
     throw e;

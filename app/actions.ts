@@ -5,6 +5,7 @@ import { isValidPair } from "@/lib/drugs";
 import {
   formatSummary,
   hashPatientId,
+  parseAdes,
   type EncounterResult,
 } from "@/lib/encounter";
 
@@ -56,12 +57,13 @@ export async function submitEncounter(
     const inserted = await sql`
       INSERT INTO encounters
         (patient_id, drug_name, therapy_start, indication, med_changes,
-         med_changes_details, events_reported, interventions)
+         med_changes_details, events_reported, ades, interventions)
       VALUES
         (${maskedPatient}, ${input.drugName}, ${input.therapyStart || null},
          ${input.indication}, ${input.medChanges},
          ${input.medChanges ? input.medChangesDetails : ""},
-         ${input.eventsReported}, ${input.interventions})
+         ${input.eventsReported}, ${parseAdes(input.eventsReported)},
+         ${input.interventions})
       RETURNING id, created_at`;
 
     const createdAt = new Date(inserted[0].created_at as string);

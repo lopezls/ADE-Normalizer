@@ -6,7 +6,6 @@ export type EncounterInput = {
   therapyStart: string;
   indication: string;
   medChanges: boolean;
-  medChangesDetails: string;
   eventsReported: string;
   interventions: string;
 };
@@ -40,7 +39,7 @@ export function formatSummary(
     `Drug: ${e.drugName}`,
     `Start of therapy: ${e.therapyStart || "Not specified"}`,
     `Indication: ${e.indication}`,
-    `Medication list changes: ${e.medChanges ? `Yes - ${dash(e.medChangesDetails)}` : "No"}`,
+    `Medication list changes: ${medListStatus(e.medChanges)}`,
     `Events reported by patient: ${dash(e.eventsReported)}`,
     `ADEs (parsed): ${parseAdes(e.eventsReported) || "None"}`,
     `Interventions provided: ${dash(e.interventions)}`,
@@ -58,4 +57,9 @@ export function parseAdes(raw: string) {
     .map((s) => s.toLowerCase().replace(/[^a-z0-9]/g, ""))
     .filter(Boolean);
   return [...new Set(ades)].join("-");
+}
+
+/** What gets stored in med_changes_details and shown in the note. */
+export function medListStatus(changed: boolean) {
+  return changed ? "updated" : "confirmed";
 }

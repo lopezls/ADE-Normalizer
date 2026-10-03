@@ -5,6 +5,7 @@ import { isValidPair } from "@/lib/drugs";
 import {
   formatSummary,
   hashPatientId,
+  medListStatus,
   parseAdes,
   type EncounterResult,
 } from "@/lib/encounter";
@@ -26,7 +27,6 @@ export async function submitEncounter(
     therapyStart: text(fd, "therapyStart"),
     indication: text(fd, "indication"),
     medChanges: text(fd, "medChanges") === "yes",
-    medChangesDetails: text(fd, "medChangesDetails"),
     eventsReported: text(fd, "eventsReported"),
     interventions: text(fd, "interventions"),
   };
@@ -38,8 +38,6 @@ export async function submitEncounter(
     return { status: "error", message: "Select a valid drug and indication." };
   if (input.therapyStart && !/^\d{4}-\d{2}-\d{2}$/.test(input.therapyStart))
     return { status: "error", message: "Start of therapy is not a valid date." };
-  if (input.medChanges && !input.medChangesDetails)
-    return { status: "error", message: "Describe the medication list changes." };
 
   try {
     await ensureSchema();
@@ -61,7 +59,7 @@ export async function submitEncounter(
       VALUES
         (${maskedPatient}, ${input.drugName}, ${input.therapyStart || null},
          ${input.indication}, ${input.medChanges},
-         ${input.medChanges ? input.medChangesDetails : ""},
+         ${medListStatus(input.medChanges)},
          ${input.eventsReported}, ${parseAdes(input.eventsReported)},
          ${input.interventions})
       RETURNING id, created_at`;

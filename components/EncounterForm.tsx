@@ -110,15 +110,6 @@ export default function EncounterForm() {
               </label>
             ))}
           </div>
-          {medChanges === "yes" && (
-            <textarea
-              name="medChangesDetails"
-              required
-              rows={3}
-              placeholder="What was added, stopped, or changed?"
-              className={`${field} mt-2`}
-            />
-          )}
         </fieldset>
 
         <div>

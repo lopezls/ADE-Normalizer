@@ -1,6 +1,7 @@
 "use server";
 
 import { ensureSchema, getSql } from "@/lib/db";
+import { isValidPair } from "@/lib/drugs";
 import {
   formatSummary,
   hashPatientId,
@@ -32,6 +33,8 @@ export async function submitEncounter(
   if (!input.patientId) return { status: "error", message: "Patient ID is required." };
   if (!input.drugName) return { status: "error", message: "Drug name is required." };
   if (!input.indication) return { status: "error", message: "Indication is required." };
+  if (!isValidPair(input.drugName, input.indication))
+    return { status: "error", message: "Select a valid drug and indication." };
   if (input.therapyStart && !/^\d{4}-\d{2}-\d{2}$/.test(input.therapyStart))
     return { status: "error", message: "Start of therapy is not a valid date." };
   if (input.medChanges && !input.medChangesDetails)

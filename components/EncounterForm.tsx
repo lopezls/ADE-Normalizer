@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { submitEncounter, type FormState } from "@/app/actions";
+import { DRUGS, DRUG_INDICATIONS, type DrugName } from "@/lib/drugs";
 
 const field =
   "w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/30 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
@@ -13,6 +14,7 @@ export default function EncounterForm() {
     { status: "idle" },
   );
   const [medChanges, setMedChanges] = useState("no");
+  const [drug, setDrug] = useState<DrugName | "">("");
   const [dismissed, setDismissed] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -32,7 +34,14 @@ export default function EncounterForm() {
 
   return (
     <>
-      <form action={action} className="space-y-5">
+      <form
+        action={action}
+        onReset={() => {
+          setDrug("");
+          setMedChanges("no");
+        }}
+        className="space-y-5"
+      >
         <div>
           <label className={label} htmlFor="patientId">Patient ID #</label>
           <input id="patientId" name="patientId" required autoComplete="off" className={field} />
@@ -44,7 +53,19 @@ export default function EncounterForm() {
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
             <label className={label} htmlFor="drugName">Drug name</label>
-            <input id="drugName" name="drugName" required className={field} />
+            <select
+              id="drugName"
+              name="drugName"
+              required
+              value={drug}
+              onChange={(e) => setDrug(e.target.value as DrugName | "")}
+              className={field}
+            >
+              <option value="" disabled>Select a drug…</option>
+              {DRUGS.map((d) => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label className={label} htmlFor="therapyStart">Start of therapy</label>
@@ -54,7 +75,23 @@ export default function EncounterForm() {
 
         <div>
           <label className={label} htmlFor="indication">Indication</label>
-          <input id="indication" name="indication" required className={field} />
+          <select
+            key={drug}
+            id="indication"
+            name="indication"
+            required
+            disabled={!drug}
+            defaultValue=""
+            className={field}
+          >
+            <option value="" disabled>
+              {drug ? "Select an indication…" : "Select a drug first"}
+            </option>
+            {drug &&
+              DRUG_INDICATIONS[drug].map((i) => (
+                <option key={i} value={i}>{i}</option>
+              ))}
+          </select>
         </div>
 
         <fieldset>

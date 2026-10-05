@@ -46,7 +46,7 @@ export default function EncounterForm() {
           <label className={label} htmlFor="patientId">Patient ID #</label>
           <input id="patientId" name="patientId" required autoComplete="off" className={field} />
           <p className="mt-1 text-xs text-zinc-500">
-            Never stored or shown again — replaced with a sequential patient number.
+            Information will be hashed and stored securely.
           </p>
         </div>
 
@@ -95,7 +95,7 @@ export default function EncounterForm() {
         </div>
 
         <fieldset>
-          <legend className={label}>Changes to the medication list?</legend>
+          <legend className={label}>Any changes to the medication list?</legend>
           <div className="flex gap-6 text-sm">
             {["no", "yes"].map((v) => (
               <label key={v} className="flex items-center gap-2">

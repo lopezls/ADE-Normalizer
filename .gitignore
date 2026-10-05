@@ -32,6 +32,10 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# GitHub wiki clone (separate repo); docs/ is the working copy
+ADE-Normalizer.wiki/
 
 # vercel
 .vercel

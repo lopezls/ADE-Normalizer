@@ -1,0 +1,278 @@
+{
+  "generatedFrom": "docs/Rules.md",
+  "reviewed": "2026-10-04",
+  "indication": "Asthma",
+  "rules": [
+    {
+      "id": "D1-01",
+      "kind": "ade",
+      "drug": "Dupixent",
+      "triggerPhrases": [
+        "diarrhea",
+        "loose stool(s)",
+        "increased bowel movements"
+      ],
+      "label": "Diarrhea",
+      "recommendation": "Hydration, replace electrolytes, Imodium, BRAT diet",
+      "contactPhysicianWhen": "Diarrhea lasting more than 2 days, signs of dehydration, fever of 102°F or higher, stools containing blood or pus",
+      "description": null,
+      "source": {
+        "name": "Cleveland Clinic",
+        "url": "https://my.clevelandclinic.org/health/diseases/4108-diarrhea"
+      }
+    },
+    {
+      "id": "D1-02",
+      "kind": "ade",
+      "drug": "Dupixent",
+      "triggerPhrases": [
+        "redness",
+        "swelling",
+        "lump where injected",
+        "injection site reaction",
+        "warm",
+        "itching"
+      ],
+      "label": "Injection site reactions",
+      "recommendation": "Warm compress, ice pack, OTC pain medication, OTC allergy medication, movement",
+      "contactPhysicianWhen": "Keeps getting worse, lasts more than 1 to 2 days, signs of infection",
+      "description": null,
+      "source": {
+        "name": "GoodRx",
+        "url": "https://www.goodrx.com/conditions/allergies/injection-site-reaction?srsltid=AU7gw4UDfhiF378KHTScNdVAeP-Nv7pkqioaWarm6cPUVIEWA-20xxNW"
+      }
+    },
+    {
+      "id": "D1-03",
+      "kind": "ade",
+      "drug": "Dupixent",
+      "triggerPhrases": [
+        "itchy eyes",
+        "eyelid inflammation",
+        "red eyelids",
+        "blurry vision"
+      ],
+      "label": "Eye and eyelid problems",
+      "recommendation": "Contact physician or optometrist as soon as possible; in the meantime, can try OTC artificial tears or OTC antihistamine drops",
+      "contactPhysicianWhen": "Contact physician as soon as possible",
+      "description": null,
+      "source": {
+        "name": "Medical News Today",
+        "url": "https://www.medicalnewstoday.com/articles/dupixent-side-effects-eyes#ways-to-manage"
+      }
+    },
+    {
+      "id": "D1-04",
+      "kind": "ade",
+      "drug": "Dupixent",
+      "triggerPhrases": [
+        "cold",
+        "cold symptoms",
+        "flu like symptoms",
+        "upper respiratory infections",
+        "sinus infections"
+      ],
+      "label": "Infections",
+      "recommendation": "Contact physician as soon as possible; can use OTC cold/flu medicine in the meantime",
+      "contactPhysicianWhen": "Contact physician as soon as possible",
+      "description": null,
+      "source": {
+        "name": "GoodRx",
+        "url": "https://www.goodrx.com/dupixent/dupixent-side-effects"
+      }
+    },
+    {
+      "id": "D1-05",
+      "kind": "ade",
+      "drug": "Dupixent",
+      "triggerPhrases": [
+        "joint pain",
+        "muscle pain",
+        "back pain",
+        "aches"
+      ],
+      "label": "Joint pain, muscle pain, or back pain",
+      "recommendation": "OTC pain relief, topical pain relief creams/patches, hot compress",
+      "contactPhysicianWhen": "Pain that gets worse",
+      "description": null,
+      "source": {
+        "name": "GoodRx",
+        "url": "https://www.goodrx.com/drugs/side-effects/common-medications-that-cause-joint-pain-cholesterol-drugs-asthma-inhalers?srsltid=AU7gw4XVNxEeoMl7fCgN723OQJslN1QBmniX0jA66H5znsvvrOlXrZVr"
+      }
+    },
+    {
+      "id": "D1-06",
+      "kind": "ade",
+      "drug": "Dupixent",
+      "triggerPhrases": [
+        "hives after my shot",
+        "swelling after injecting",
+        "trouble breathing after my last dose",
+        "rash all over"
+      ],
+      "label": "Reported allergic reaction",
+      "recommendation": "Advise holding the next dose until the prescriber is contacted; call 911 if breathing trouble or swelling of the face, lips, tongue, or throat occurs",
+      "contactPhysicianWhen": "Contact the prescriber right away",
+      "description": null,
+      "source": {
+        "name": "Label"
+      }
+    },
+    {
+      "id": "D1-MD",
+      "kind": "missed-dose",
+      "drug": "Dupixent",
+      "triggerPhrases": [],
+      "label": "Missed dose",
+      "recommendation": "Inject within 7 days of the missed dose and continue the original schedule; if more than 7 days, wait for the next scheduled dose",
+      "contactPhysicianWhen": null,
+      "description": "Patient says they missed a dose",
+      "source": {
+        "name": "Label"
+      }
+    },
+    {
+      "id": "S-01",
+      "kind": "call-step",
+      "drug": null,
+      "triggerPhrases": [],
+      "label": "Self-identify",
+      "recommendation": null,
+      "contactPhysicianWhen": null,
+      "description": "State your name, title, and where you're calling from",
+      "source": {
+        "name": "Standard practice (demo)"
+      }
+    },
+    {
+      "id": "S-02",
+      "kind": "call-step",
+      "drug": null,
+      "triggerPhrases": [],
+      "label": "Recording disclosure",
+      "recommendation": null,
+      "contactPhysicianWhen": null,
+      "description": "Tell the patient the call is being recorded",
+      "source": {
+        "name": "Standard practice (demo)"
+      }
+    },
+    {
+      "id": "S-03",
+      "kind": "call-step",
+      "drug": null,
+      "triggerPhrases": [],
+      "label": "Verify patient identity",
+      "recommendation": null,
+      "contactPhysicianWhen": null,
+      "description": "Confirm the patient's date of birth before discussing any PHI",
+      "source": {
+        "name": "Standard practice (demo)"
+      }
+    },
+    {
+      "id": "S-04",
+      "kind": "call-step",
+      "drug": null,
+      "triggerPhrases": [],
+      "label": "Manufacturer reporting and consent",
+      "recommendation": null,
+      "contactPhysicianWhen": null,
+      "description": "Explain that side effects and product complaints are reported to the manufacturer, and ask whether they may contact the patient, the doctor, both, or neither if they have follow-up questions",
+      "source": {
+        "name": "Standard practice (demo)"
+      }
+    },
+    {
+      "id": "S-05",
+      "kind": "call-step",
+      "drug": null,
+      "triggerPhrases": [],
+      "label": "Closing reminder",
+      "recommendation": null,
+      "contactPhysicianWhen": null,
+      "description": "Tell the doctor about any side effects; call 911 for a serious emergency",
+      "source": {
+        "name": "Standard practice (demo)"
+      }
+    },
+    {
+      "id": "S-06",
+      "kind": "call-step",
+      "drug": null,
+      "triggerPhrases": [],
+      "label": "Ask about ER visit / hospitalization",
+      "recommendation": null,
+      "contactPhysicianWhen": null,
+      "description": "Ask whether the patient has been to the ER or hospital recently (see G-02)",
+      "source": {
+        "name": "Standard practice (demo)"
+      }
+    },
+    {
+      "id": "G-01",
+      "kind": "general",
+      "drug": null,
+      "triggerPhrases": [],
+      "label": "Missed dose: adherence support",
+      "recommendation": null,
+      "contactPhysicianWhen": null,
+      "description": "If a missed dose is reported, the pharmacist should suggest ways to support adherence, such as alarms, pill boxes, and calendars. This appears as a pending checklist item, and if it is not covered by the end of the call, it is flagged as not covered",
+      "source": {
+        "name": "Not cited"
+      }
+    },
+    {
+      "id": "G-02",
+      "kind": "general",
+      "drug": null,
+      "triggerPhrases": [],
+      "label": "Seriousness prompts",
+      "recommendation": null,
+      "contactPhysicianWhen": null,
+      "description": "Always ask about ER visits and hospitalization",
+      "source": {
+        "name": "Not cited"
+      }
+    },
+    {
+      "id": "G-03",
+      "kind": "general",
+      "drug": null,
+      "triggerPhrases": [],
+      "label": "Patient's own attribution",
+      "recommendation": null,
+      "contactPhysicianWhen": null,
+      "description": "If the patient blames something else (food poisoning, a new supplement), record it as stated; do not decide causality",
+      "source": {
+        "name": "Not cited"
+      }
+    },
+    {
+      "id": "G-04",
+      "kind": "general",
+      "drug": null,
+      "triggerPhrases": [],
+      "label": "Unmatched symptom",
+      "recommendation": null,
+      "contactPhysicianWhen": null,
+      "description": "If nothing matches, record the verbatim text and show \"no rule matched; pharmacist to assess\"",
+      "source": {
+        "name": "Not cited"
+      }
+    },
+    {
+      "id": "G-05",
+      "kind": "general",
+      "drug": null,
+      "triggerPhrases": [],
+      "label": "Verbatim first",
+      "recommendation": null,
+      "contactPhysicianWhen": null,
+      "description": "The patient's exact words always stay in the note next to the standardized label",
+      "source": {
+        "name": "Not cited"
+      }
+    }
+  ]
+}

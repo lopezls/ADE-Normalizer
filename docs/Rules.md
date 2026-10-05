@@ -52,13 +52,14 @@ Note: to remain within scope and timeline constraints, we will only construct ru
 
 ### Call steps (all drugs, every check-in)
 
-| Step | Key points | Source |
-|---|---|---|
-| Self-identify | State your name, title, and where you're calling from | Standard practice (demo) |
-| Recording disclosure | Tell the patient the call is being recorded | Standard practice (demo) |
-| Verify patient identity | Confirm the patient's date of birth before discussing any PHI | Standard practice (demo) |
-| Manufacturer reporting and consent | Explain that side effects and product complaints are reported to the manufacturer, and ask whether they may contact the patient, the doctor, both, or neither if they have follow-up questions | Standard practice (demo) |
-| Closing reminder | Tell the doctor about any side effects; call 911 for a serious emergency | Standard practice (demo) |
+| ID | Step | Key points | Source |
+|---|---|---|---|
+| S-01 | Self-identify | State your name, title, and where you're calling from | Standard practice (demo) |
+| S-02 | Recording disclosure | Tell the patient the call is being recorded | Standard practice (demo) |
+| S-03 | Verify patient identity | Confirm the patient's date of birth before discussing any PHI | Standard practice (demo) |
+| S-04 | Manufacturer reporting and consent | Explain that side effects and product complaints are reported to the manufacturer, and ask whether they may contact the patient, the doctor, both, or neither if they have follow-up questions | Standard practice (demo) |
+| S-05 | Closing reminder | Tell the doctor about any side effects; call 911 for a serious emergency | Standard practice (demo) |
+| S-06 | Ask about ER visit / hospitalization | Ask whether the patient has been to the ER or hospital recently (see G-02) | Standard practice (demo) |
 
 ### Dupixent counseling topics (Indication: Asthma)
 
@@ -86,10 +87,10 @@ Note: to remain within scope and timeline constraints, we will only construct ru
 
 ## Rules that apply to every drug
 
-| Rule | Behavior |
-|---|---|
-| **Missed dose: adherence support** | If a missed dose is reported, the pharmacist should suggest ways to support adherence, such as alarms, pill boxes, and calendars. This appears as a pending checklist item, and if it is not covered by the end of the call, it is flagged as not covered |
-| **Seriousness prompts** | Always ask about ER visits and hospitalization |
-| **Patient's own attribution** | If the patient blames something else (food poisoning, a new supplement), record it as stated; do not decide causality |
-| **Unmatched symptom** | If nothing matches, record the verbatim text and show "no rule matched; pharmacist to assess" |
-| **Verbatim first** | The patient's exact words always stay in the note next to the standardized label |
+| ID | Rule | Behavior |
+|---|---|---|
+| G-01 | **Missed dose: adherence support** | If a missed dose is reported, the pharmacist should suggest ways to support adherence, such as alarms, pill boxes, and calendars. This appears as a pending checklist item, and if it is not covered by the end of the call, it is flagged as not covered |
+| G-02 | **Seriousness prompts** | Always ask about ER visits and hospitalization |
+| G-03 | **Patient's own attribution** | If the patient blames something else (food poisoning, a new supplement), record it as stated; do not decide causality |
+| G-04 | **Unmatched symptom** | If nothing matches, record the verbatim text and show "no rule matched; pharmacist to assess" |
+| G-05 | **Verbatim first** | The patient's exact words always stay in the note next to the standardized label |

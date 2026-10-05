@@ -30,12 +30,3 @@ export const SAMPLE_TRANSCRIPT = [
     text: "Yes, I missed last night's dose. I've also had some diarrhea.",
   },
 ];
-
-export const SAMPLE_RECOMMENDATION = {
-  ruleId: "D1-01",
-  label: "Diarrhea",
-  text: "Hydration, replace electrolytes, Imodium, BRAT diet",
-  contactWhen:
-    "Diarrhea lasting more than 2 days, signs of dehydration, fever of 102°F or higher, stools containing blood or pus",
-  source: "Cleveland Clinic",
-};

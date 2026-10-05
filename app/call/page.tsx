@@ -5,11 +5,17 @@ import TranscriptStrip from "@/components/call/TranscriptStrip";
 import RecommendationsPanel from "@/components/call/RecommendationsPanel";
 import {
   SAMPLE_CHECKLIST,
-  SAMPLE_RECOMMENDATION,
   SAMPLE_TRANSCRIPT,
 } from "@/components/call/sampleData";
 
+import { getRule, type Rule } from "@/lib/call/rules";
+
 export const metadata: Metadata = { title: "Live Call | Rx Call Aide" };
+
+// Placeholder until the call state exists: pretend these two rules matched.
+const SAMPLE_MATCHED_RULES = ["D1-01", "D1-MD"]
+  .map(getRule)
+  .filter((r): r is Rule => r !== undefined);
 
 export default function CallPage() {
   return (
@@ -35,7 +41,7 @@ export default function CallPage() {
           <EncounterPanel />
           <TranscriptStrip transcript={SAMPLE_TRANSCRIPT} />
         </div>
-        <RecommendationsPanel recommendations={[SAMPLE_RECOMMENDATION]} />
+        <RecommendationsPanel rules={SAMPLE_MATCHED_RULES} />
       </div>
     </main>
   );

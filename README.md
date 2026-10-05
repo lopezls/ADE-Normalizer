@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Rx Call Aide
 
-## Getting Started
+*Live checklist and decision support for pharmacist patient check-in calls.*
 
-First, run the development server:
+> **Demo project.** Built on my own time and separate from any employer's systems. It uses scripted, fictional calls only, stores no patient identifiers, and is not a clinical decision tool.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+**Live demo (encounter form):** https://ade-normalizer.vercel.app
+**Full documentation:** [Project wiki](https://github.com/lopezls/ADE-Normalizer/wiki)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+*The repository name (`ADE-Normalizer`) comes from the project's first idea, which grew into the live-call tool described here.*
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## The problem
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Specialty pharmacists make regular check-in calls to patients on high-cost medications. On every call they have to verify identity, get consent, ask about side effects and missed doses, recognize adverse drug events (ADEs), offer guidance, and document everything. Steps get missed, and ADE details get recorded inconsistently.
 
-## Learn More
+## What it does
 
-To learn more about Next.js, take a look at the following resources:
+An AI assistant supports the pharmacist during the call. The pharmacist stays in control.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Left: Checklist.** Required steps turn from red to green as the pharmacist completes them. Steps triggered by what the patient says (for example, adherence support after a missed dose) appear in red and are flagged if not covered.
+- **Center: Live chart note.** The note builds as the call goes, keeping the patient's exact words next to a standardized label. A collapsible strip shows what the AI heard.
+- **Right: Recommendations.** When something the patient reports matches a rule, a suggestion appears with the rule that triggered it.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Nothing is charted, finalized, or reported without the pharmacist's review.
 
-## Deploy on Vercel
+## Status
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Stage | What it is | Status |
+|---|---|---|
+| Pre-stage | Encounter form with a privacy-by-design patient number | Done |
+| 1 | Scripted call streams in; checklist, recommendations, and chart note work | In progress |
+| 2 | Live microphone, WebSocket, and streaming transcription | Planned |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Scope
+
+- Browser-based demo, not real phone calls
+- Pharmacist-authored rules for three drugs, starting with Dupixent (asthma)
+- Advisory only; the tool drafts a note and never submits anything
+
+## Privacy
+
+- No patient identifiers are collected; entered IDs are replaced with a sequential number
+- Date of birth and name spoken on a call are used only to tick the identity step and are not saved
+- The transcript is shown during the call and discarded when the session ends
+
+See [Privacy & Safety](https://github.com/lopezls/ADE-Normalizer/wiki/Privacy) for details.
+
+## Built with
+
+Next.js, deployed on Vercel. Stage 2 adds a separate persistent service for the WebSocket connection and a streaming speech-to-text provider.
+
+
+## Documentation
+
+- [Business requirements and use cases](https://github.com/lopezls/ADE-Normalizer/wiki)
+- [Screen layout](https://github.com/lopezls/ADE-Normalizer/wiki/Screen-Layout)
+- [Rules table](https://github.com/lopezls/ADE-Normalizer/wiki/Rules)
+- [Demo call script](https://github.com/lopezls/ADE-Normalizer/wiki/Demo-Call)
+- [Privacy & safety](https://github.com/lopezls/ADE-Normalizer/wiki/Privacy)
+
+## Author
+
+Lorelei Lopez, PharmD, MBA, [github.com/lopezls](https://github.com/lopezls)

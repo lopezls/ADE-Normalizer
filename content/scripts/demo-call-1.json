@@ -1,0 +1,110 @@
+{
+  "id": "demo-call-1",
+  "title": "Demo Call 1: Diarrhea after a missed dose (Dupixent, asthma)",
+  "setup": {
+    "drug": "Dupixent",
+    "indication": "Asthma"
+  },
+  "lines": [
+    {
+      "turn": 1,
+      "speaker": "pharmacist",
+      "text": "Hi, this is Alex, a pharmacist with the patient management program at Demo Specialty Pharmacy. Is this Jordan?"
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "Hi, yes, this is Jordan."
+    },
+    {
+      "turn": 3,
+      "speaker": "pharmacist",
+      "text": "Great, and just so you know, this call is being recorded."
+    },
+    {
+      "turn": 4,
+      "speaker": "pharmacist",
+      "text": "Before we continue, can you confirm your date of birth for privacy?"
+    },
+    {
+      "turn": 5,
+      "speaker": "patient",
+      "text": "Sure, it's January 1st, 2002."
+    },
+    {
+      "turn": 6,
+      "speaker": "pharmacist",
+      "text": "Thank you for confirming that. You're currently taking Dupixent, one 300 mg injection under the skin every 2 weeks. We like to check in and see how you're doing and whether you've had any side effects or any other issues. If you report any side effects or product complaints, we report them to the manufacturer. If they have follow-up questions, would it be alright if they contacted you or your doctor?"
+    },
+    {
+      "turn": 7,
+      "speaker": "patient",
+      "text": "They can contact my doctor, not me."
+    },
+    {
+      "turn": 8,
+      "speaker": "pharmacist",
+      "text": "No problem, I'll note that. Have you had any side effects or missed any doses?"
+    },
+    {
+      "turn": 9,
+      "speaker": "patient",
+      "text": "Yes, I missed last night's dose. I usually take my shot on Friday every other week, but last night I got out of work late. I've also had some diarrhea."
+    },
+    {
+      "turn": 10,
+      "speaker": "pharmacist",
+      "text": "I'm sorry to hear that. Working late is understandable. How long has the diarrhea been going on?"
+    },
+    {
+      "turn": 11,
+      "speaker": "patient",
+      "text": "About a day, just today and yesterday."
+    },
+    {
+      "turn": 12,
+      "speaker": "pharmacist",
+      "text": "Have you tried anything?"
+    },
+    {
+      "turn": 13,
+      "speaker": "patient",
+      "text": "Not really."
+    },
+    {
+      "turn": 14,
+      "speaker": "pharmacist",
+      "text": "I understand. Just remember with diarrhea to keep replacing fluids and electrolytes. Bland foods like bananas and applesauce can help, and you can use Imodium if needed. If it lasts more than two days, or you get a fever of 102 or higher or signs of dehydration, contact your doctor. Since you missed last night's dose, you can inject it now because it's within 7 days, and then keep your regular schedule."
+    },
+    {
+      "turn": 15,
+      "speaker": "patient",
+      "text": "Okay, that makes sense."
+    },
+    {
+      "turn": 16,
+      "speaker": "pharmacist",
+      "text": "Have you been to the ER or hospital recently?"
+    },
+    {
+      "turn": 17,
+      "speaker": "patient",
+      "text": "Nope."
+    },
+    {
+      "turn": 18,
+      "speaker": "pharmacist",
+      "text": "Good to hear. Remember to tell your doctor about any side effects, and call 911 if you ever have a serious emergency. Is there anything else I can help with?"
+    },
+    {
+      "turn": 19,
+      "speaker": "patient",
+      "text": "No, that's all. Thank you."
+    },
+    {
+      "turn": 20,
+      "speaker": "pharmacist",
+      "text": "Thank you so much for speaking with me today. We'll check back in a couple of months, but you can always reach out if needed. Have a good day."
+    }
+  ]
+}

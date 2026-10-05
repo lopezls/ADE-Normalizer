@@ -9,23 +9,23 @@ const labelCls = "text-sm font-medium text-zinc-800 dark:text-zinc-200";
 
 type Source = "ai" | "pharmacist" | "empty";
 
-// Placeholder values standing in for what the AI will type during the call.
+// Starts blank. Drug and indication come from the call setup; the rest are filled by the AI from step 5 on.
 const INITIAL = {
   drug: "Dupixent",
   indication: "Asthma",
   therapyStart: "",
   medChanges: "no",
-  events: "I've also had some diarrhea.",
+  events: "",
   interventions: "",
-  consent: "doctor",
-  missedDose: "Last night's dose. Reason per patient: \"last night I got out of work late.\"",
-  erOrHospital: "none",
+  consent: "",
+  missedDose: "",
+  erOrHospital: "",
   seriousness: "",
 };
 type Values = typeof INITIAL;
 
 const AI_FILLED: (keyof Values)[] = [
-  "drug", "indication", "events", "consent", "missedDose", "erOrHospital",
+  "events", "consent", "missedDose", "erOrHospital", "interventions",
 ];
 
 function Badge({ source }: { source: Source }) {
@@ -49,7 +49,7 @@ export default function EncounterPanel() {
   const [edited, setEdited] = useState<Set<keyof Values>>(new Set());
 
   const sourceOf = (k: keyof Values): Source =>
-    edited.has(k) ? "pharmacist" : AI_FILLED.includes(k) ? "ai" : "empty";
+    edited.has(k) ? "pharmacist" : AI_FILLED.includes(k) && values[k] ? "ai" : "empty";
 
   function set<K extends keyof Values>(k: K, v: Values[K]) {
     setValues((s) => ({ ...s, [k]: v }));

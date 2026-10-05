@@ -139,3 +139,29 @@ describe("pharmacist edits", () => {
     expect(s).toEqual(initialState(DEMO_CALL_1.setup));
   });
 });
+
+describe("live-mode actions (hear + apply)", () => {
+  it("hear then apply gives the same result as deliver", () => {
+    let a = initialState(DEMO_CALL_1.setup);
+    let b = initialState(DEMO_CALL_1.setup);
+    for (const line of DEMO_CALL_1.lines.slice(0, 9)) {
+      a = callReducer(a, { type: "deliver", line, update: replayFor(line.turn) });
+      b = callReducer(b, { type: "hear", line });
+      b = callReducer(b, { type: "apply", turn: line.turn, update: replayFor(line.turn) });
+    }
+    expect(b).toEqual(a);
+  });
+
+  it("the line is visible before its analysis arrives", () => {
+    const s = callReducer(initialState(DEMO_CALL_1.setup), { type: "hear", line: DEMO_CALL_1.lines[0] });
+    expect(s.transcript).toHaveLength(1);
+    expect(done(s, "S-01")).toBe(false);
+  });
+
+  it("server warnings are kept for display", () => {
+    const s = callReducer(initialState(DEMO_CALL_1.setup), {
+      type: "apply", turn: 9, update: {}, warnings: ["Turn 9: something was dropped"],
+    });
+    expect(s.warnings).toEqual(["Turn 9: something was dropped"]);
+  });
+});

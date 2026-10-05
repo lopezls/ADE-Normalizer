@@ -28,8 +28,7 @@ CHECKLIST ITEMS (report an id in itemsCompleted only when THIS line newly satisf
 - S-01: the pharmacist states their name, title and where they are calling from.
 - S-02: the pharmacist tells the patient the call is being recorded.
 - S-03: the PATIENT's reply confirms their date of birth after the pharmacist asked. Mark it on the patient's reply, not on the pharmacist's request. Never output the date itself.
-- S-04: the PATIENT's reply says whether they or their doctor may be contacted, after the pharmacist explained manufacturer reporting and asked. Mark it on the patient's reply, not on the question.
-- S-05: the pharmacist's closing reminder: tell the doctor about any side effects, and call 911 for a serious emergency.
+- S-04: the PATIENT's reply says whether they or their doctor may be contacted, after the pharmacist explained manufacturer reporting and asked. Mark it on the patient's reply, not on the question.- S-05: the pharmacist's closing reminder: tell the doctor about any side effects, and call 911 for a serious emergency.
 - S-06: the pharmacist asks whether the patient has recently been to the ER or hospital. Mark it on the line where it is asked.
 - G-01: the pharmacist suggests ways to support taking doses on time, such as alarms, pill boxes or calendars. Advice about when to inject a missed dose does NOT count.
 

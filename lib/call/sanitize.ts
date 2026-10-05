@@ -85,8 +85,11 @@ export function sanitize(raw: RawModelOutput, ctx: SanitizeContext): Sanitized {
 
   // Consent, missed dose, events and the ER answer come from the patient only.
   if (raw.consent) {
-    if (patient) out.consent = raw.consent;
-    else warn("consent reported on a pharmacist line and was dropped");
+    if (patient) {
+      out.consent = raw.consent;
+      // Any consent answer, including "no contact", completes the consent step.
+      if (!out.itemsCompleted.includes("S-04")) out.itemsCompleted.push("S-04");
+    } else warn("consent reported on a pharmacist line and was dropped");
   }
   if (raw.missedDose) {
     if (patient) {

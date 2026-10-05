@@ -35,7 +35,7 @@ The deployed encounter form already provides:
 
 - Drug selection (Dupixent, Jascayd, and Tymlos) with indication options that depend on the drug
 - Start of therapy, medication-list changes, events reported, and interventions provided
-- A privacy-by-design patient identifier: the entered ID is never stored and is replaced with a sequential patient number
+- A privacy-by-design patient identifier: the entered ID is never stored as typed; only a keyed one-way hash is kept, and the encounter shows a sequential patient number (the live call screen collects no ID)
 
 **The new work adds a live layer on top of this form.** The form becomes the structured chart note that the call produces.
 

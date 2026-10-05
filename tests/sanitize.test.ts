@@ -139,3 +139,15 @@ describe("prompt", () => {
     expect(prompt).toContain("loose stool");
   });
 });
+
+describe("consent completes S-04 in code", () => {
+  it("adds S-04 when the patient gives any consent answer, even 'none'", () => {
+    const { update } = sanitize({ ...empty, consent: "none" }, ctx(7));
+    expect(update.consent).toBe("none");
+    expect(update.itemsCompleted).toContain("S-04");
+  });
+  it("does not add S-04 when consent came from a pharmacist line", () => {
+    const { update } = sanitize({ ...empty, consent: "doctor" }, ctx(6));
+    expect(update.itemsCompleted).not.toContain("S-04");
+  });
+});

@@ -9,9 +9,10 @@ An AI assistant that supports a pharmacist during a patient check-in call. It ke
 ## Data handling
 
 - The demo uses scripted, fictional calls only. No real calls, no real patient information, and no information from any employer.
-- The encounter form does not store the patient identifier. The entered ID is replaced with a sequential number.
-- The date of birth and name spoken on a call are used only to tick the identity-verification step. They are not saved.
-- The transcript is shown on screen during the call so the pharmacist can verify what the AI heard. It is discarded when the session ends.
+- The original encounter form does not store the entered patient ID itself. It stores a keyed one-way hash of it (pseudonymous, not anonymous) and shows a sequential patient number. The live call screen collects no patient ID at all.
+- While a call plays, each line of text is sent to the Anthropic Claude API so it can be analyzed. In the demo that text is a fictional script, including a fictional date of birth. Anthropic's own data handling applies to what it receives. This app keeps none of it.
+- The date of birth and name spoken on a call are used only to tick the identity-verification step. They are not saved by this app, and the safety checks remove anything that looks like a date of birth from the AI's answer.
+- The transcript is shown on screen during the call so the pharmacist can verify what the AI heard. It lives only in the browser's memory and is discarded when the page is closed or refreshed.
 
 ## What the AI is not allowed to decide
 

@@ -1,6 +1,6 @@
-import type { SampleItem } from "./sampleData";
+import type { ChecklistItem } from "@/lib/call/checklist";
 
-export default function ChecklistPanel({ items }: { items: SampleItem[] }) {
+export default function ChecklistPanel({ items }: { items: ChecklistItem[] }) {
   return (
     <section aria-labelledby="checklist-h" className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
       <h2 id="checklist-h" className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">

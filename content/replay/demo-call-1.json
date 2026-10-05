@@ -1,0 +1,34 @@
+{
+  "scriptId": "demo-call-1",
+  "note": "Hand-written to match the 'What the tool should do' table in docs/Demo-Call.md. Replaced by outputs recorded from the real model in step 7. Turns not listed have nothing to report.",
+  "turns": {
+    "1": { "itemsCompleted": ["S-01"] },
+    "3": { "itemsCompleted": ["S-02"] },
+    "5": { "itemsCompleted": ["S-03"] },
+    "6": { "drug": { "name": "Dupixent", "strength": "300 mg", "frequency": "every 2 weeks" } },
+    "7": { "itemsCompleted": ["S-04"], "consent": "doctor" },
+    "9": {
+      "missedDose": {
+        "whichDose": "Last night's dose",
+        "reason": "last night I got out of work late",
+        "schedule": "usually Friday, every other week"
+      },
+      "events": [{ "ref": "new", "verbatim": "I've also had some diarrhea", "ruleId": "D1-01" }]
+    },
+    "11": { "events": [{ "ref": "e1", "duration": "About a day, just today and yesterday" }] },
+    "13": { "events": [{ "ref": "e1", "treatmentsTried": "Not really" }] },
+    "14": {
+      "interventions": [
+        {
+          "summary": "Advised replacing fluids and electrolytes, bland foods (bananas, applesauce), and Imodium if needed; contact doctor if diarrhea lasts more than 2 days, fever of 102°F or higher, or signs of dehydration."
+        },
+        {
+          "summary": "Advised to inject the missed dose now (within 7 days) and continue the regular schedule."
+        }
+      ]
+    },
+    "16": { "itemsCompleted": ["S-06"] },
+    "17": { "erOrHospital": "none" },
+    "18": { "itemsCompleted": ["S-05"] }
+  }
+}

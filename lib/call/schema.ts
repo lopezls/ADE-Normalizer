@@ -55,6 +55,8 @@ export const AnalyzeRequestSchema = z.object({
   line: LineSchema,
   recent: z.array(LineSchema).max(4),
   state: CompactStateSchema,
+  /** Live calls only: the drug and indication on the form. Checked against the drug list before use. */
+  setup: z.object({ drug: z.string().max(40), indication: z.string().max(80) }).optional(),
 });
 export type AnalyzeRequest = z.infer<typeof AnalyzeRequestSchema>;
 

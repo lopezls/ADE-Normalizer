@@ -2,81 +2,54 @@
 
 import { ensureSchema, getSql } from "@/lib/db";
 import { isValidPair } from "@/lib/drugs";
-import {
-  formatSummary,
-  hashPatientId,
-  medListStatus,
-  parseAdes,
-  type EncounterResult,
-} from "@/lib/encounter";
+import { medListStatus, parseAdes } from "@/lib/encounter";
 
-export type FormState =
-  | { status: "idle" }
+export type CallEncounterInput = {
+  drugName: string;
+  indication: string;
+  therapyStart: string;
+  medChanges: boolean;
+  eventsReported: string;
+  interventions: string;
+  /** Pharmacist-reviewed standard terms, one per ADE. */
+  ades: string[];
+};
+
+export type SaveCallState =
   | { status: "error"; message: string }
-  | { status: "success"; result: EncounterResult };
+  | { status: "success"; encounterNumber: number };
 
-const text = (fd: FormData, key: string) => String(fd.get(key) ?? "").trim();
+/** Saves a finished call. No patient ID: the call screen never collects one. */
+export async function saveCallEncounter(input: CallEncounterInput): Promise<SaveCallState> {
+  const drugName = String(input.drugName ?? "").trim();
+  const indication = String(input.indication ?? "").trim();
+  const therapyStart = String(input.therapyStart ?? "").trim();
+  const eventsReported = String(input.eventsReported ?? "").trim().slice(0, 4000);
+  const interventions = String(input.interventions ?? "").trim().slice(0, 4000);
+  const terms = Array.isArray(input.ades)
+    ? input.ades.slice(0, 20).map((a) => String(a).trim().slice(0, 100).replace(/-/g, " "))
+    : [];
 
-export async function submitEncounter(
-  _prev: FormState,
-  fd: FormData,
-): Promise<FormState> {
-  const input = {
-    patientId: text(fd, "patientId"),
-    drugName: text(fd, "drugName"),
-    therapyStart: text(fd, "therapyStart"),
-    indication: text(fd, "indication"),
-    medChanges: text(fd, "medChanges") === "yes",
-    eventsReported: text(fd, "eventsReported"),
-    interventions: text(fd, "interventions"),
-  };
-
-  if (!input.patientId) return { status: "error", message: "Patient ID is required." };
-  if (!input.drugName) return { status: "error", message: "Drug name is required." };
-  if (!input.indication) return { status: "error", message: "Indication is required." };
-  if (!isValidPair(input.drugName, input.indication))
-    return { status: "error", message: "Select a valid drug and indication." };
-  if (input.therapyStart && !/^\d{4}-\d{2}-\d{2}$/.test(input.therapyStart))
+  if (!isValidPair(drugName, indication))
+    return { status: "error", message: "Select a valid drug and indication on the form first." };
+  if (therapyStart && !/^\d{4}-\d{2}-\d{2}$/.test(therapyStart))
     return { status: "error", message: "Start of therapy is not a valid date." };
 
   try {
     await ensureSchema();
     const sql = getSql();
-    const hash = hashPatientId(input.patientId);
-
-    // SELECT first so the serial (masked number) doesn't skip on repeat patients.
-    let rows = await sql`SELECT id FROM patients WHERE pt_hash = ${hash}`;
-    if (rows.length === 0) {
-      await sql`INSERT INTO patients (pt_hash) VALUES (${hash}) ON CONFLICT (pt_hash) DO NOTHING`;
-      rows = await sql`SELECT id FROM patients WHERE pt_hash = ${hash}`;
-    }
-    const maskedPatient = rows[0].id as number;
-
     const inserted = await sql`
       INSERT INTO encounters
         (patient_id, drug_name, therapy_start, indication, med_changes,
          med_changes_details, events_reported, ades, interventions)
       VALUES
-        (${maskedPatient}, ${input.drugName}, ${input.therapyStart || null},
-         ${input.indication}, ${input.medChanges},
-         ${medListStatus(input.medChanges)},
-         ${input.eventsReported}, ${parseAdes(input.eventsReported)},
-         ${input.interventions})
-      RETURNING id, created_at`;
-
-    const createdAt = new Date(inserted[0].created_at as string);
-    const encounterNumber = inserted[0].id as number;
-    return {
-      status: "success",
-      result: {
-        encounterNumber,
-        maskedPatient,
-        createdAt: createdAt.toISOString(),
-        summary: formatSummary(input, maskedPatient, encounterNumber, createdAt),
-      },
-    };
+        (NULL, ${drugName}, ${therapyStart || null}, ${indication}, ${!!input.medChanges},
+         ${medListStatus(!!input.medChanges)}, ${eventsReported},
+         ${parseAdes(terms.join("\n"))}, ${interventions})
+      RETURNING id`;
+    return { status: "success", encounterNumber: inserted[0].id as number };
   } catch (err) {
-    console.error("submitEncounter failed", err);
+    console.error("saveCallEncounter failed", err);
     if (err instanceof Error && err.message.endsWith("is not set"))
       return { status: "error", message: `Server misconfigured: ${err.message}.` };
     return { status: "error", message: "Could not save the encounter. Please try again." };

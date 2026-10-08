@@ -2,7 +2,7 @@ import type { Rule } from "@/lib/call/rules";
 
 export default function RecommendationsPanel({ rules }: { rules: Rule[] }) {
   return (
-    <section aria-labelledby="recs-h" className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+    <section aria-labelledby="recs-h" className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
       <h2 id="recs-h" className="mb-1 text-sm font-semibold uppercase tracking-wide text-zinc-500">
         Recommendations
       </h2>
@@ -14,7 +14,7 @@ export default function RecommendationsPanel({ rules }: { rules: Rule[] }) {
           <p className="text-sm text-zinc-500">Nothing matched yet.</p>
         )}
         {rules.map((r) => (
-          <article key={r.id} className="rounded-md border border-zinc-200 p-3 text-sm dark:border-zinc-700">
+          <article key={r.id} className="rounded-xl border border-zinc-200 p-3 text-sm dark:border-zinc-700">
             <div className="mb-1 flex items-center justify-between gap-2">
               <h3 className="font-semibold">{r.label}</h3>
               <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs dark:bg-zinc-800">

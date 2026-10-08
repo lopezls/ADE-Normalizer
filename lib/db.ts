@@ -36,6 +36,8 @@ export function ensureSchema() {
       )`;
     // Added after first deploy; existing rows get ''.
     await sql`ALTER TABLE encounters ADD COLUMN IF NOT EXISTS ades TEXT NOT NULL DEFAULT ''`;
+    // Call-screen encounters have no patient ID (stage 1 never asks for one).
+    await sql`ALTER TABLE encounters ALTER COLUMN patient_id DROP NOT NULL`;
   })().catch((e) => {
     schemaReady = null;
     throw e;

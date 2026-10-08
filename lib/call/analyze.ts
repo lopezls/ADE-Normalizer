@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { buildSystemPrompt, buildUserMessage } from "./prompt";
+import { isValidPair } from "../drugs";
 import { sanitize, type Sanitized } from "./sanitize";
 import { ModelOutputSchema, type AnalyzeRequest } from "./schema";
 import { DEMO_CALL_1 } from "./script";
@@ -16,7 +17,8 @@ export async function analyzeLine(req: AnalyzeRequest): Promise<Sanitized> {
   if (!process.env.ANTHROPIC_API_KEY) throw new AnalyzeError("ANTHROPIC_API_KEY is not set");
 
   const client = new Anthropic(); // reads ANTHROPIC_API_KEY from the environment
-  const { drug, indication } = DEMO_CALL_1.setup;
+  const { drug, indication } =
+    req.setup && isValidPair(req.setup.drug, req.setup.indication) ? req.setup : DEMO_CALL_1.setup;
 
   const response = await client.messages.parse({
     model: process.env.ANTHROPIC_MODEL || DEFAULT_MODEL,

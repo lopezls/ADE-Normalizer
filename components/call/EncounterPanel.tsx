@@ -4,24 +4,26 @@ import { DRUGS, DRUG_INDICATIONS, type DrugName } from "@/lib/drugs";
 import type { CallState, FormField } from "@/lib/call/types";
 
 const field =
-  "w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/30 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
+  "w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/30 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
 const labelCls = "text-sm font-medium text-zinc-800 dark:text-zinc-200";
 
 type Props = {
   state: CallState;
   onEdit: (field: FormField, value: string) => void;
+  /** Opens the review dialog. The button only shows after End call. */
+  onSubmit: () => void;
 };
 
 function Badge({ text, tone }: { text: string; tone: "ai" | "you" | "rule" }) {
   const cls = {
-    ai: "bg-teal-100 text-teal-900 dark:bg-teal-950 dark:text-teal-200",
+    ai: "bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200",
     you: "bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200",
     rule: "bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200",
   }[tone];
   return <span className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${cls}`}>{text}</span>;
 }
 
-export default function EncounterPanel({ state, onEdit }: Props) {
+export default function EncounterPanel({ state, onEdit, onSubmit }: Props) {
   const { form } = state;
 
   const badge = (k: FormField) => {
@@ -48,7 +50,7 @@ export default function EncounterPanel({ state, onEdit }: Props) {
   return (
     <section
       aria-labelledby="enc-h"
-      className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
+      className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
     >
       <h2 id="enc-h" className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
         Encounter (typed by the AI, editable by you)
@@ -161,6 +163,18 @@ export default function EncounterPanel({ state, onEdit }: Props) {
             <option value="non-serious">Non-serious</option>
             <option value="serious">Serious</option>
           </select>)}
+
+        {state.ended && (
+          <div className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
+            <button
+              type="button"
+              onClick={onSubmit}
+              className="rounded-full bg-zinc-900 dark:bg-lime-200 dark:text-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-700 dark:hover:bg-lime-100"
+            >
+              Submit
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

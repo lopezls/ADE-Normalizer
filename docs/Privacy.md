@@ -8,7 +8,8 @@ An AI assistant that supports a pharmacist during a patient check-in call. It ke
 
 ## Data handling
 
-- The demo uses scripted, fictional calls only. No real calls, no real patient information, and no information from any employer.
+- The demo is meant for fictional calls only: the scripted call, or a microphone call where you play both parts. Do not speak real patient information.
+- In Microphone mode, the browser streams audio to Deepgram for transcription (Deepgram's own data handling applies), and each finished sentence is sent to Anthropic for analysis. This app keeps neither the audio nor the transcript; only the reviewed ADEs are saved when you press Submit.
 - The original encounter form does not store the entered patient ID itself. It stores a keyed one-way hash of it (pseudonymous, not anonymous) and shows a sequential patient number. The live call screen collects no patient ID at all.
 - While a call plays, each line of text is sent to the Anthropic Claude API so it can be analyzed. In the demo that text is a fictional script, including a fictional date of birth. Anthropic's own data handling applies to what it receives. This app keeps none of it.
 - The date of birth and name spoken on a call are used only to tick the identity-verification step. They are not saved by this app, and the safety checks remove anything that looks like a date of birth from the AI's answer.

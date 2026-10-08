@@ -1,5 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { AnalyzeError, analyzeLine } from "@/lib/call/analyze";
+import { checkLiveAccess } from "@/lib/call/liveAccess";
+import { LIVE_SCRIPT_ID } from "@/lib/call/liveConstants";
 import { AnalyzeRequestSchema, checkAgainstScript } from "@/lib/call/schema";
 
 export const maxDuration = 30;
@@ -20,8 +22,9 @@ export async function POST(request: Request) {
   const parsed = AnalyzeRequestSchema.safeParse(json);
   if (!parsed.success) return Response.json({ ok: false, error: "Invalid request" }, { status: 400 });
 
-  const notAllowed = checkAgainstScript(parsed.data);
-  if (notAllowed) return Response.json({ ok: false, error: notAllowed }, { status: 422 });
+  const notAllowed =
+    parsed.data.scriptId === LIVE_SCRIPT_ID ? checkLiveAccess(request) : checkAgainstScript(parsed.data);
+  if (notAllowed) return Response.json({ ok: false, error: notAllowed }, { status: parsed.data.scriptId === LIVE_SCRIPT_ID ? 401 : 422 });
 
   try {
     const { update, warnings } = await analyzeLine(parsed.data);

@@ -16,6 +16,7 @@ export type CallAction =
   // Live mode: the line shows up first, its analysis arrives a moment later.
   | { type: "hear"; line: Line }
   | { type: "apply"; turn: number; update: Partial<ModelOutput>; warnings?: string[] }
+  | { type: "relabel"; turn: number; speaker: Line["speaker"] }
   | { type: "edit"; field: FormField; value: string }
   | { type: "confirmSeriousness"; value: boolean }
   | { type: "end" }
@@ -188,6 +189,8 @@ export function callReducer(s: CallState, a: CallAction): CallState {
       const applied = applyUpdate(s, a.turn, { ...EMPTY_OUTPUT, ...a.update });
       return a.warnings?.length ? { ...applied, warnings: [...applied.warnings, ...a.warnings] } : applied;
     }
+    case "relabel":
+      return { ...s, transcript: s.transcript.map((l) => (l.turn === a.turn ? { ...l, speaker: a.speaker } : l)) };
     case "edit":
       return {
         ...s,

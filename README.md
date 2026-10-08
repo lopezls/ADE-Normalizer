@@ -9,15 +9,16 @@ Requirements and design live in [docs/](docs/): `Home.md` (requirements), `Rules
 ```bash
 npm install
 cp .env.example .env.local   # then fill in the values below
-npm run dev                  # http://localhost:3000, call screen at /call
+npm run dev                  # http://localhost:3000, the call screen is the home page
 ```
 
 | Variable | Needed for |
 |---|---|
-| `ANTHROPIC_API_KEY` | Live AI on `/call` (server only; never prefix with `NEXT_PUBLIC_`). Without it, use the Replay switch. |
+| `ANTHROPIC_API_KEY` | Live AI on the call screen (server only; never prefix with `NEXT_PUBLIC_`). Without it, use the Replay switch. |
 | `ANTHROPIC_MODEL` | Optional. Defaults to `claude-haiku-4-5`. |
-| `STORAGE_DATABASE_URL` (or `DATABASE_URL`) | The original encounter form and `/data` (Neon Postgres). |
-| `PATIENT_ID_SECRET` | The original encounter form (hashes the patient ID). |
+| `DEEPGRAM_API_KEY` | Microphone mode: live speech-to-text with speaker labels (server only). |
+| `LIVE_CALL_PASSCODE` | Microphone mode passcode. Required in production, optional in local development. |
+| `STORAGE_DATABASE_URL` (or `DATABASE_URL`) | Saving encounters and `/data` (Neon Postgres). |
 
 ## Commands
 

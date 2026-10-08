@@ -8,7 +8,7 @@ import { PASSCODE_HEADER } from "./liveConstants";
  * is required; in local development it is optional. Returns an error or null.
  */
 export function checkLiveAccess(request: Request): string | null {
-  const expected = process.env.LIVE_CALL_PASSCODE;
+  const expected = process.env.LIVE_CALL_PASSCODE?.trim();
   if (!expected) {
     return process.env.NODE_ENV === "production" ? "Live microphone is not enabled on this server" : null;
   }

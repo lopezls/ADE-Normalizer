@@ -1,5 +1,6 @@
-export type Word = { word: string; punctuated_word?: string; speaker?: number };
-export type RawTurn = { speaker: number; text: string };
+export type Word = { word: string; punctuated_word?: string; speaker?: number; end?: number };
+/** `endAt` is when the turn's last word ended, in seconds of audio sent so far. Used only for timing. */
+export type RawTurn = { speaker: number; text: string; endAt?: number };
 
 /**
  * Turns Deepgram's finalized words into whole turns. Words from the same
@@ -17,9 +18,10 @@ export class TurnBuilder {
       const text = w.punctuated_word ?? w.word;
       if (this.pending && this.pending.speaker === speaker) {
         this.pending.text += ` ${text}`;
+        if (w.end !== undefined) this.pending.endAt = w.end;
       } else {
         if (this.pending) done.push(this.pending);
-        this.pending = { speaker, text };
+        this.pending = { speaker, text, endAt: w.end };
       }
     }
     if (speechFinal && this.pending) {

@@ -49,6 +49,8 @@ export default function CallScreen() {
   const nextTurn = useRef(1);
   const firstSpeaker = useRef<number | null>(null);
   const swappedRef = useRef(false);
+  // When each turn was handed over, and how long after speech that was (microphone timing).
+  const heardAt = useRef<Record<number, { at: number; lagMs?: number }>>({});
 
   // The latest state, readable from async code without stale closures.
   const stateRef = useRef(state);
@@ -66,11 +68,27 @@ export default function CallScreen() {
 
   const setStatus = (turn: number, text: string) => setLineStatus((m) => ({ ...m, [turn]: text }));
 
+  // Where the wait went, in seconds, for microphone lines: after speech / in queue / AI / total.
+  function timing(turn: number, started: number, serverMs?: number) {
+    const h = heardAt.current[turn];
+    if (!h) return "";
+    const now = Date.now();
+    const s = (ms: number) => (ms / 1000).toFixed(1);
+    const parts = [
+      h.lagMs !== undefined && `heard ${s(h.lagMs)}s after speech`,
+      `queue ${s(started - h.at)}s`,
+      serverMs !== undefined ? `AI ${s(serverMs)}s` : `AI+network ${s(now - started)}s`,
+      `total ${s(now - h.at + (h.lagMs ?? 0))}s`,
+    ].filter(Boolean);
+    return ` · ${parts.join(" · ")}`;
+  }
+
   async function analyze(line: Line) {
     const myRun = runId.current;
     setFailed(null);
     setPending(line.turn);
     setStatus(line.turn, "reading…");
+    const started = Date.now();
     try {
       if (mode === "replay") {
         dispatch({ type: "apply", turn: line.turn, update: replayFor(line.turn) });
@@ -80,7 +98,8 @@ export default function CallScreen() {
         if (myRun !== runId.current) return;
         dispatch({ type: "apply", turn: line.turn, update: result.update, warnings: result.warnings });
         const ticked = result.update.itemsCompleted ?? [];
-        setStatus(line.turn, ticked.length ? `read, ticked ${ticked.join(", ")}` : "read");
+        const base = ticked.length ? `read, ticked ${ticked.join(", ")}` : "read";
+        setStatus(line.turn, base + timing(line.turn, started, result.serverMs));
       }
       setPending(null);
     } catch (err) {
@@ -94,10 +113,11 @@ export default function CallScreen() {
   }
 
   // A finished turn from the microphone: show it, then queue its analysis behind earlier ones.
-  function handleTurn(raw: RawTurn) {
+  function handleTurn(raw: RawTurn & { lagMs?: number }) {
     firstSpeaker.current ??= raw.speaker;
     const speaker = roleFor(raw.speaker, firstSpeaker.current, swappedRef.current);
     const line: Line = { turn: nextTurn.current++, speaker, text: raw.text };
+    heardAt.current[line.turn] = { at: Date.now(), lagMs: raw.lagMs };
     dispatch({ type: "hear", line });
     chain.current = chain.current.then(() => analyze(line));
   }
@@ -262,6 +282,7 @@ export default function CallScreen() {
               void stopListening();
               chain.current = Promise.resolve();
               nextTurn.current = 1;
+              heardAt.current = {};
               firstSpeaker.current = null;
               setMicError(null);
               setLineStatus({});

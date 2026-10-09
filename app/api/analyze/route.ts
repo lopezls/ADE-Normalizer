@@ -27,8 +27,9 @@ export async function POST(request: Request) {
   if (notAllowed) return Response.json({ ok: false, error: notAllowed }, { status: parsed.data.scriptId === LIVE_SCRIPT_ID ? 401 : 422 });
 
   try {
+    const t0 = Date.now();
     const { update, warnings } = await analyzeLine(parsed.data);
-    return Response.json({ ok: true, turn: parsed.data.line.turn, update, warnings });
+    return Response.json({ ok: true, turn: parsed.data.line.turn, update, warnings, ms: Date.now() - t0 });
   } catch (err) {
     const kind =
       err instanceof AnalyzeError ? err.message

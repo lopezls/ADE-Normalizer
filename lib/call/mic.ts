@@ -3,15 +3,15 @@ import { TurnBuilder, type RawTurn, type Word } from "./turns";
 
 const DEEPGRAM_URL =
   "wss://api.deepgram.com/v1/listen?model=nova-3&language=en-US&diarize=true&smart_format=true" +
-  "&interim_results=true&endpointing=600&utterance_end_ms=1000";
+  "&interim_results=true&endpointing=300&utterance_end_ms=1000";
 
 // Deepgram does not always say when a speaker has paused (speech_final), so a turn
 // is also handed over after this long with no new words.
-const IDLE_FLUSH_MS = 1200;
+const IDLE_FLUSH_MS = 700;
 
 export type MicHandlers = {
   /** A finished turn of speech. `speaker` is Deepgram's voice number, not yet a role. */
-  onTurn: (turn: RawTurn) => void;
+  onTurn: (turn: RawTurn & { lagMs?: number }) => void;
   /** Words still being recognized, for a "hearing..." line. Empty string clears it. */
   onInterim: (text: string) => void;
   /** The connection or microphone failed. The mic is already stopped. */
@@ -55,7 +55,13 @@ export async function startMic(h: MicHandlers): Promise<MicSession> {
     if (recorder && recorder.state !== "inactive") recorder.stop();
     stream.getTracks().forEach((t) => t.stop());
   };
-  const emit = (turns: RawTurn[]) => turns.forEach(h.onTurn);
+  // lagMs: how long after the last word was spoken the turn was handed over (Deepgram's
+  // pause detection plus our wait). Approximate: audio is sent in 100 ms pieces.
+  let startedAt = 0;
+  const emit = (turns: RawTurn[]) =>
+    turns.forEach((t) =>
+      h.onTurn({ ...t, lagMs: t.endAt === undefined ? undefined : Math.max(0, Date.now() - startedAt - t.endAt * 1000) }),
+    );
 
   await new Promise<void>((resolve, reject) => {
     ws.onopen = () => resolve();
@@ -69,7 +75,8 @@ export async function startMic(h: MicHandlers): Promise<MicSession> {
   recorder.ondataavailable = (e) => {
     if (e.data.size > 0 && ws.readyState === WebSocket.OPEN) ws.send(e.data);
   };
-  recorder.start(250);
+  recorder.start(100);
+  startedAt = Date.now();
 
   ws.onmessage = (ev) => {
     let msg: DeepgramMessage;

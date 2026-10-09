@@ -14,7 +14,8 @@ const liveHeaders = (): Record<string, string> => (livePasscode ? { [PASSCODE_HE
 
 const TIMEOUT_MS = 25_000;
 
-export type AnalyzeResult = { update: Partial<ModelOutput>; warnings: string[] };
+/** `serverMs` is how long the server spent on the model; the rest of the round trip is network. */
+export type AnalyzeResult = { update: Partial<ModelOutput>; warnings: string[]; serverMs?: number };
 
 /** Browser side: ask /api/analyze what one line shows. Throws an Error with a readable message. */
 export async function analyzeRemote(
@@ -42,12 +43,12 @@ export async function analyzeRemote(
       signal: controller.signal,
     });
     const json = (await res.json().catch(() => null)) as
-      | { ok: true; update: Partial<ModelOutput>; warnings: string[] }
+      | { ok: true; update: Partial<ModelOutput>; warnings: string[]; ms?: number }
       | { ok: false; error: string }
       | null;
     if (!json) throw new Error(`Unexpected response (${res.status})`);
     if (!json.ok) throw new Error(json.error);
-    return { update: json.update, warnings: json.warnings };
+    return { update: json.update, warnings: json.warnings, serverMs: json.ms };
   } catch (err) {
     if (err instanceof DOMException && err.name === "AbortError")
       throw new Error("The AI took too long to answer");

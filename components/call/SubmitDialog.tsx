@@ -2,9 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { saveCallEncounter } from "@/app/actions";
-import { cleanTerm, initialRows, type AdeRow } from "@/lib/call/ades";
+import { buildEncounterInput, cleanTerm, initialRows, type AdeRow } from "@/lib/call/ades";
 import { buildChartNote } from "@/lib/call/chartNote";
-import { scoreCall } from "@/lib/call/score";
 import { normalizeRemote } from "@/lib/call/client";
 import type { CallState } from "@/lib/call/types";
 
@@ -15,6 +14,8 @@ type Props = {
   useAi: boolean;
   /** Microphone call: normalizing goes through the passcode-protected path. */
   live: boolean;
+  /** Resolves to the id of the record saved automatically at End call, or null if that save failed. */
+  ensureRecord: () => Promise<number | null>;
   onClose: () => void;
   onConfirmSeriousness: (value: boolean) => void;
 };
@@ -26,7 +27,7 @@ const primary =
 const input =
   "w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/30 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
 
-export default function SubmitDialog({ state, open, useAi, live, onClose, onConfirmSeriousness }: Props) {
+export default function SubmitDialog({ state, open, useAi, live, ensureRecord, onClose, onConfirmSeriousness }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
   const [rows, setRows] = useState<AdeRow[]>(() => initialRows(state.events));
   const [normalizing, setNormalizing] = useState(false);
@@ -90,17 +91,11 @@ export default function SubmitDialog({ state, open, useAi, live, onClose, onConf
     setSaving(true);
     setError(null);
     try {
+      // The call was already saved at End call; this updates it with the reviewed ADEs.
+      const encounterId = (await ensureRecord()) ?? undefined;
       const res = await saveCallEncounter({
-        drugName: state.form.drug,
-        indication: state.form.indication,
-        therapyStart: state.form.therapyStart,
-        medChanges: state.form.medChanges === "yes",
-        medChangeList: state.medChangeList.filter((m) => m.name.trim()).map((m) => ({ name: m.name.trim(), action: m.action })),
-        eventsReported: state.form.events,
-        interventions: state.form.interventions,
-        ades: rows.map((r) => r.term.trim()).filter(Boolean),
-        rphName: state.form.rphName,
-        audit: scoreCall(state).rows.map(({ id, label, done, extra }) => ({ id, label, done, extra })),
+        ...buildEncounterInput(state, rows.map((r) => r.term.trim()).filter(Boolean)),
+        encounterId,
       });
       if (res.status === "success") setSavedAs(res.encounterNumber);
       else setError(res.message);

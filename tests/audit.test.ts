@@ -39,3 +39,20 @@ describe("percentOf", () => {
     expect(percentOf([])).toBe(0);
   });
 });
+
+describe("buildEncounterInput", () => {
+  it("carries the form, the reviewed ADEs and the audit rows", async () => {
+    const { buildEncounterInput } = await import("../lib/call/ades");
+    const { callReducer, initialState } = await import("../lib/call/reducer");
+    const { DEMO_CALL_1 } = await import("../lib/call/script");
+    let s = initialState(DEMO_CALL_1.setup);
+    s = callReducer(s, { type: "edit", field: "rphName", value: "Alex" });
+    s = callReducer(s, { type: "end" });
+    const input = buildEncounterInput(s, ["diarrhea"]);
+    expect(input.rphName).toBe("Alex");
+    expect(input.ades).toEqual(["diarrhea"]);
+    expect(input.drugName).toBe("Dupixent");
+    expect(input.audit).toHaveLength(10);
+    expect(input.audit.every((r) => r.done === false)).toBe(true);
+  });
+});

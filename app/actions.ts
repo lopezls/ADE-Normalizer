@@ -1,7 +1,7 @@
 "use server";
 
 import { ensureSchema, getSql } from "@/lib/db";
-import { isValidPair } from "@/lib/drugs";
+import { DRUGS, isValidPair } from "@/lib/drugs";
 import { medListStatus, parseAdes } from "@/lib/encounter";
 import { percentOf, type AuditRow } from "@/lib/call/score";
 
@@ -17,6 +17,10 @@ export type CallEncounterInput = {
   /** Pharmacist-reviewed standard terms, one per ADE. */
   ades: string[];
   rphName: string;
+  /** Set when a record for this call already exists (made automatically at End call): update it instead of adding another. */
+  encounterId?: number;
+  /** Automatic save at End call: the indication may still be blank. Submit is always strict. */
+  draft?: boolean;
   /** Every scored step of the call and whether it was covered. The percentage is recomputed here. */
   audit: AuditRow[];
 };
@@ -59,14 +63,31 @@ export async function saveCallEncounter(input: CallEncounterInput): Promise<Save
   }));
   const scorePercent = audit.length ? percentOf(audit) : null;
 
-  if (!isValidPair(drugName, indication))
-    return { status: "error", message: "Select a valid drug and indication on the form first." };
+  const valid = isValidPair(drugName, indication) || (input.draft === true && (DRUGS as string[]).includes(drugName) && indication === "");
+  if (!valid) return { status: "error", message: "Select a valid drug and indication on the form first." };
   if (therapyStart && !/^\d{4}-\d{2}-\d{2}$/.test(therapyStart))
     return { status: "error", message: "Start of therapy is not a valid date." };
 
   try {
     await ensureSchema();
     const sql = getSql();
+    const auditJson = audit.length ? JSON.stringify(audit) : null;
+    const adesText = parseAdes(terms.join("\n"));
+
+    // A record made at End call is updated in place (only call records, and only recent ones).
+    const id = Number.isInteger(input.encounterId) ? (input.encounterId as number) : null;
+    if (id !== null) {
+      const updated = await sql`
+        UPDATE encounters SET
+          drug_name = ${drugName}, therapy_start = ${therapyStart || null}, indication = ${indication},
+          med_changes = ${!!input.medChanges}, med_changes_details = ${medDetails},
+          events_reported = ${eventsReported}, ades = ${adesText}, interventions = ${interventions},
+          rph_name = ${rphName}, score_percent = ${scorePercent}, audit = ${auditJson}::jsonb
+        WHERE id = ${id} AND patient_id IS NULL AND created_at > now() - interval '1 day'
+        RETURNING id`;
+      if (updated.length > 0) return { status: "success", encounterNumber: updated[0].id as number };
+    }
+
     const inserted = await sql`
       INSERT INTO encounters
         (patient_id, drug_name, therapy_start, indication, med_changes,
@@ -75,8 +96,8 @@ export async function saveCallEncounter(input: CallEncounterInput): Promise<Save
       VALUES
         (NULL, ${drugName}, ${therapyStart || null}, ${indication}, ${!!input.medChanges},
          ${medDetails}, ${eventsReported},
-         ${parseAdes(terms.join("\n"))}, ${interventions},
-         ${rphName}, ${scorePercent}, ${audit.length ? JSON.stringify(audit) : null}::jsonb)
+         ${adesText}, ${interventions},
+         ${rphName}, ${scorePercent}, ${auditJson}::jsonb)
       RETURNING id`;
     return { status: "success", encounterNumber: inserted[0].id as number };
   } catch (err) {

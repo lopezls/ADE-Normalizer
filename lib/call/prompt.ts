@@ -28,7 +28,7 @@ CHECKLIST ITEMS (report an id in itemsCompleted only when THIS line newly satisf
 - S-01: the pharmacist states their name, title and where they are calling from.
 - S-02: the pharmacist tells the patient the call is being recorded.
 - S-03: the PATIENT's reply confirms their date of birth after the pharmacist asked. Mark it on the patient's reply, not on the pharmacist's request. Never output the date itself.
-- S-05: the pharmacist's closing: tells the patient when they will reach out again (for example "we'll check back in a couple of months") and that the patient can call or reach out with any questions. Mark it on the line where the follow-up timeline is given. Reminders about telling the doctor or calling 911 do NOT count.
+- S-05: the pharmacist's closing: tells the patient when they will reach out again (for example "we'll check back in a couple of months") and that the patient can call or reach out with any questions. Mark it on the line where the follow-up timeline is given. The line must actually state WHEN they will reach out again (a time such as "in a couple of months" or "next week"). A plain goodbye, "have a good day", or a reminder to keep the doctor updated or call 911 does NOT count.
 - S-10: the pharmacist asks whether the patient has any barriers or difficulty giving the medication (for example trouble with the injection, cost, access, storage or getting refills). Mark it on the line where it is asked.
 - S-11: the pharmacist reviews the medication's directions for use (the SIG) with the patient: how much, how it is taken or injected, and how often. Mark it on the line where the directions are reviewed.
 - S-08: the pharmacist asks whether anything on the patient's medication list has changed (new medicines, stopped medicines, dose changes). Mark it on the line where it is asked.
@@ -41,6 +41,7 @@ OTHER FIELDS
 - pharmacistName: pharmacist lines only. The name the pharmacist gives for themself when introducing themself (for example "Alex", or "Alex Rivera"). Copy it exactly as said, without a title. null on every other line.
 - drug: only when this line states the drug name, strength or how often it is taken.
 - missedDose: patient lines only, when the patient says they missed a dose. whichDose = which dose. reason = the patient's own words for why. schedule = how they usually take it.
+- medChanges: patient lines only. One entry per medicine the patient says they STARTED or STOPPED taking (for example "I started metformin last week" or "my doctor took me off lisinopril"). name = the medicine's name exactly as the patient said it. action = "started" or "stopped". Do not list dose changes, missed doses, or medicines the patient only mentions without a change. Empty list otherwise. A medicine change is never an event.
 - events: patient lines only. One entry per side effect or symptom the patient reports.
   - ref "new" for a new event. verbatim must be copied exactly, word for word, from the patient's line. Do not paraphrase.
   - ruleId: the best matching ADE rule by MEANING (not exact words), or null if none fits. Do not force a match.

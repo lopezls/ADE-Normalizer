@@ -154,6 +154,18 @@ function applyUpdate(s: CallState, turn: number, u: ModelOutput): CallState {
   }
   if (next.events.length > 0) aiSet("events", eventsText(next.events));
 
+  // Medicines the patient started or stopped. Saying so turns the radio to Yes and adds a row each,
+  // unless the pharmacist has already answered that question themself.
+  if (u.medChanges.length > 0 && !s.edited.medChanges) {
+    next.form.medChanges = "yes";
+    next.aiFilled.medChanges = true;
+    next.medChangeList = [...s.medChangeList];
+    for (const m of u.medChanges) {
+      const known = next.medChangeList.some((x) => x.name.trim().toLowerCase() === m.name.trim().toLowerCase());
+      if (!known) next.medChangeList.push({ id: `ai${next.medChangeList.length + 1}-${turn}`, name: m.name, action: m.action });
+    }
+  }
+
   // ER / hospital. Code pre-fills seriousness only when the patient reports none.
   if (u.erOrHospital) {
     aiSet("erOrHospital", u.erOrHospital);

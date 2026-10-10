@@ -7,7 +7,7 @@ import { RULES } from "../lib/call/rules";
 
 const line = (turn: number) => DEMO_CALL_1.lines[turn - 1];
 const empty: RawModelOutput = {
-  itemsCompleted: [], drug: null, pharmacistName: null, missedDose: null,
+  itemsCompleted: [], drug: null, pharmacistName: null, missedDose: null, medChanges: [],
   events: [], erOrHospital: null, interventions: [],
 };
 const ctx = (turn: number, knownEventIds: string[] = []) => ({ line: line(turn), knownEventIds });
@@ -147,5 +147,38 @@ describe("asking for questions completes S-09 in code", () => {
   it("does not add S-09 on a patient line", () => {
     const { update } = sanitize({ ...empty }, { line: { turn: 19, speaker: "patient" as const, text: "I don't have any questions." }, knownEventIds: [] });
     expect(update.itemsCompleted).not.toContain("S-09");
+  });
+});
+
+describe("sanitize does not share state between calls", () => {
+  it("medicine changes from one call never appear in the next", () => {
+    const patientLine = { turn: 7, speaker: "patient" as const, text: "I started metformin last week." };
+    const first = sanitize(
+      { ...empty, medChanges: [{ name: "metformin", action: "started" }] },
+      { line: patientLine, knownEventIds: [] },
+    );
+    expect(first.update.medChanges).toHaveLength(1);
+    const second = sanitize({ ...empty }, { line: { ...patientLine, text: "No changes." }, knownEventIds: [] });
+    expect(second.update.medChanges).toEqual([]);
+  });
+});
+
+describe("closing step needs a stated follow-up time", () => {
+  const say = (text: string) => ({ line: { turn: 21, speaker: "pharmacist" as const, text }, knownEventIds: [] });
+  const withS05 = { ...empty, itemsCompleted: ["S-05" as const] };
+
+  it("keeps S-05 when the pharmacist says when they will reach out", () => {
+    expect(sanitize(withS05, say("We'll check back in a couple of months, but you can always reach out.")).update.itemsCompleted).toContain("S-05");
+    expect(sanitize(withS05, say("We'll reach back out in about two months, and please call us with questions.")).update.itemsCompleted).toContain("S-05");
+  });
+
+  it("drops S-05 for a plain goodbye with no follow-up time", () => {
+    const r = sanitize(withS05, say("Wonderful. Make sure you keep your doctor updated on how you are doing. Have a good day, Mr. Smith. Bye."));
+    expect(r.update.itemsCompleted).not.toContain("S-05");
+    expect(r.warnings.join(" ")).toContain("S-05");
+  });
+
+  it("does not count 'reach out' without a time", () => {
+    expect(sanitize(withS05, say("Feel free to reach out if you need anything.")).update.itemsCompleted).not.toContain("S-05");
   });
 });

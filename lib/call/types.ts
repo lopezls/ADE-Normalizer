@@ -15,6 +15,8 @@ export type ModelOutput = {
   /** The pharmacist's own name, as they say it when introducing themself. */
   pharmacistName: string | null;
   missedDose: { whichDose: string; reason?: string; schedule?: string } | null;
+  /** Medicines the patient says they started or stopped (patient lines only). */
+  medChanges: { name: string; action: "started" | "stopped" }[];
   events: {
     ref: "new" | string; // "new", or the ID of an event already recorded
     verbatim?: string;
@@ -32,6 +34,7 @@ export const EMPTY_OUTPUT: ModelOutput = {
   drug: null,
   pharmacistName: null,
   missedDose: null,
+  medChanges: [],
   events: [],
   erOrHospital: null,
   interventions: [],

@@ -1,0 +1,35 @@
+{
+  "id": "john-smith-call",
+  "title": "Presentation call: Mr. John Smith, back pain (Dupixent, asthma)",
+  "setup": {
+    "drug": "Dupixent",
+    "indication": "Asthma"
+  },
+  "voices": {
+    "pharmacist": "Microsoft Zira Desktop",
+    "patient": "Microsoft David Desktop"
+  },
+  "lines": [
+    { "turn": 1, "speaker": "pharmacist", "text": "Hello, my name is Alex. I'm a pharmacist calling for Mr. John Smith." },
+    { "turn": 2, "speaker": "patient", "text": "Yes, this is John Smith. Where are you calling from?" },
+    { "turn": 3, "speaker": "pharmacist", "text": "Yes, I'm Alex, a pharmacist here at the Lemon Specialty Pharmacy, and just to let you know, we are on a recorded line." },
+    { "turn": 4, "speaker": "patient", "text": "Oh yes, how can I help you?" },
+    { "turn": 5, "speaker": "pharmacist", "text": "I was just calling to check in to see how you were doing, but first, could you please verify your date of birth?" },
+    { "turn": 6, "speaker": "patient", "text": "Oh yes, that is October 27th, 1954." },
+    { "turn": 7, "speaker": "pharmacist", "text": "Thank you for that. I wanted to see how you were doing on the Dupixent that you get from us. It's 300 mg under the skin every other week for your asthma. Have you had any trouble using the medication or injecting it?" },
+    { "turn": 8, "speaker": "patient", "text": "Oh no, it's been just fine. No trouble at all." },
+    { "turn": 9, "speaker": "pharmacist", "text": "And have you had any changes to your medication list? Have you started or stopped any medications?" },
+    { "turn": 10, "speaker": "patient", "text": "I did recently start taking a multivitamin." },
+    { "turn": 11, "speaker": "pharmacist", "text": "Okay, I will update that. And have you missed any doses since starting the medication?" },
+    { "turn": 12, "speaker": "patient", "text": "Oh no, I take it as prescribed." },
+    { "turn": 13, "speaker": "pharmacist", "text": "Have you experienced any side effects?" },
+    { "turn": 14, "speaker": "patient", "text": "Just some back pain." },
+    { "turn": 15, "speaker": "pharmacist", "text": "Sorry to hear about that. That is a common side effect with this medication. You can try over the counter Aleve or Tylenol to help." },
+    { "turn": 16, "speaker": "patient", "text": "Thank you, I will try that." },
+    { "turn": 17, "speaker": "pharmacist", "text": "Have you been to the ER or the hospital recently?" },
+    { "turn": 18, "speaker": "patient", "text": "Oh no, I have not been, thank goodness." },
+    { "turn": 19, "speaker": "pharmacist", "text": "Good to hear. And do you have any questions for me about the medication?" },
+    { "turn": 20, "speaker": "patient", "text": "No, none at all. Thank you." },
+    { "turn": 21, "speaker": "pharmacist", "text": "Wonderful. Make sure you keep your doctor updated on how you are doing. Have a good day, Mr. Smith. Bye." }
+  ]
+}

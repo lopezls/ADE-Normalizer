@@ -2,13 +2,17 @@
 
 import { useEffect, useReducer, useRef, useState } from "react";
 import { visibleChecklist } from "@/lib/call/checklist";
+import { saveCallEncounter } from "@/app/actions";
+import { buildEncounterInput, initialRows } from "@/lib/call/ades";
 import { analyzeRemote, checkLivePasscode } from "@/lib/call/client";
+import { scoreCall } from "@/lib/call/score";
 import { startMic, type MicSession } from "@/lib/call/mic";
 import { callReducer, initialState } from "@/lib/call/reducer";
 import { replayFor } from "@/lib/call/replay";
 import { getRule, type Rule } from "@/lib/call/rules";
 import { DEMO_CALL_1, lineDelayMs, type Line } from "@/lib/call/script";
 import { roleFor, type RawTurn } from "@/lib/call/turns";
+import type { CallState } from "@/lib/call/types";
 import ChecklistPanel from "./ChecklistPanel";
 import EncounterPanel from "./EncounterPanel";
 import RecommendationsPanel from "./RecommendationsPanel";
@@ -45,6 +49,9 @@ export default function CallScreen() {
   const [lineStatus, setLineStatus] = useState<Record<number, string>>({});
   const [swapped, setSwapped] = useState(false);
   const [ending, setEnding] = useState(false);
+  // The audit score is saved by itself when the call ends. Submit later updates that record.
+  const [auditStatus, setAuditStatus] = useState<string | null>(null);
+  const auditRecord = useRef<Promise<number | null> | null>(null);
   const micRef = useRef<MicSession | null>(null);
   const chain = useRef<Promise<void>>(Promise.resolve());
   const nextTurn = useRef(1);
@@ -166,12 +173,35 @@ export default function CallScreen() {
     if (!res.ok) setUnlockError(res.error);
   }
 
+  // Saves the finished call (and its audit score) right away so it shows on the Data page.
+  function saveAuditRecord(final: CallState) {
+    const percent = scoreCall(final).percent;
+    setAuditStatus("Saving the audit score…");
+    auditRecord.current = saveCallEncounter({
+      ...buildEncounterInput(final, initialRows(final.events).map((r) => r.term)),
+      draft: true,
+    })
+      .then((res) => {
+        if (res.status === "success") {
+          setAuditStatus(`Audit score ${percent}% saved to the Data page.`);
+          return res.encounterNumber;
+        }
+        setAuditStatus(`The audit score was not saved: ${res.message}`);
+        return null;
+      })
+      .catch(() => {
+        setAuditStatus("The audit score was not saved: could not reach the server.");
+        return null;
+      });
+  }
+
   async function endCall() {
     setPlaying(false);
     setEnding(true);
     await stopListening();
     await chain.current; // let the last turns finish being analyzed
     setEnding(false);
+    saveAuditRecord(stateRef.current);
     dispatch({ type: "end" });
   }
 
@@ -215,6 +245,18 @@ export default function CallScreen() {
             {isMic ? (micOn ? " · listening" : "") : ` of ${script.lines.length}`}
             {pending !== null && ` · AI is reading line ${pending}…`}
           </p>
+          {state.ended && auditStatus && (
+            <p
+              role="status"
+              className={`mt-1 text-xs font-medium ${
+                auditStatus.includes("not saved")
+                  ? "text-red-700 dark:text-red-300"
+                  : "text-emerald-800 dark:text-emerald-300"
+              }`}
+            >
+              {auditStatus}
+            </p>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <fieldset className="mr-2 flex items-center gap-3 text-sm" disabled={cursor > 0}>
@@ -287,6 +329,8 @@ export default function CallScreen() {
               firstSpeaker.current = null;
               setMicError(null);
               setLineStatus({});
+              setAuditStatus(null);
+              auditRecord.current = null;
               setEnding(false);
               setPlaying(false);
               setPending(null);
@@ -440,6 +484,7 @@ export default function CallScreen() {
           open={submitOpen}
           useAi={mode !== "replay"}
           live={isMic}
+          ensureRecord={() => auditRecord.current ?? Promise.resolve(null)}
           onClose={() => setSubmitOpen(false)}
           onConfirmSeriousness={(value) => dispatch({ type: "confirmSeriousness", value })}
         />

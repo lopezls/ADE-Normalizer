@@ -17,6 +17,7 @@ export const ModelOutputSchema = z.object({
   drug: z.object({ name: str, strength: str, frequency: str }).nullable(),
   pharmacistName: str,
   missedDose: z.object({ whichDose: z.string(), reason: str, schedule: str }).nullable(),
+  medChanges: z.array(z.object({ name: z.string(), action: z.enum(["started", "stopped"]) })),
   events: z.array(
     z.object({
       ref: z.string(),

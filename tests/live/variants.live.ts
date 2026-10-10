@@ -68,6 +68,24 @@ const CASES: Case[] = [
     ok: (u) => u.itemsCompleted.includes("S-11"),
   },
   {
+    name: "patient started a medicine is captured",
+    line: T(7, "Yes, my doctor started me on metformin last week."),
+    recent: [P(6, "Have there been any changes to your medication list?")],
+    ok: (u) => u.medChanges.length === 1 && /metformin/i.test(u.medChanges[0].name) && u.medChanges[0].action === "started" && u.events.length === 0,
+  },
+  {
+    name: "patient stopped a medicine is captured",
+    line: T(7, "I stopped taking my allergy pill, Zyrtec, two weeks ago."),
+    recent: [P(6, "Have there been any changes to your medication list?")],
+    ok: (u) => u.medChanges.length === 1 && /zyrtec/i.test(u.medChanges[0].name) && u.medChanges[0].action === "stopped",
+  },
+  {
+    name: "no medication changes gives none",
+    line: T(7, "No, nothing has changed."),
+    recent: [P(6, "Have there been any changes to your medication list?")],
+    ok: (u) => u.medChanges.length === 0,
+  },
+  {
     name: "asking about medication changes completes S-08",
     line: P(6, "Have you started or stopped any medicines recently?"),
     recent: [T(5, "Sure.")],
@@ -165,6 +183,7 @@ describe("variants against the live model", () => {
           state: c.state ?? emptyState,
         });
         if (c.ok(update)) pass++;
+        else if (process.env.SHOW_FAILS) console.log("    got:", JSON.stringify(update));
       }
       if (pass < RUNS) failures++;
       console.log(`  ${pass === RUNS ? "PASS" : "FAIL"} ${pass}/${RUNS}  ${c.name}`);

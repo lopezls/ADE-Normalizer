@@ -1,4 +1,6 @@
-import type { EventRecord } from "./types";
+import type { CallEncounterInput } from "@/app/actions";
+import { scoreCall } from "./score";
+import type { CallState, EventRecord } from "./types";
 
 /** One reviewed ADE row: what the patient said, and the standard term the pharmacist signs off on. */
 export type AdeRow = { id: string; verbatim: string; term: string };
@@ -22,4 +24,25 @@ export function fallbackTerm(e: Pick<EventRecord, "label" | "verbatim">): string
 
 export function initialRows(events: EventRecord[]): AdeRow[] {
   return events.map((e) => ({ id: e.id, verbatim: e.verbatim, term: fallbackTerm(e) }));
+}
+
+/**
+ * Everything saved for a finished call. Used for the automatic save at End call (with the
+ * unreviewed terms) and again at Submit (with the pharmacist's reviewed terms).
+ */
+export function buildEncounterInput(state: CallState, ades: string[]): CallEncounterInput {
+  return {
+    drugName: state.form.drug,
+    indication: state.form.indication,
+    therapyStart: state.form.therapyStart,
+    medChanges: state.form.medChanges === "yes",
+    medChangeList: state.medChangeList
+      .filter((m) => m.name.trim())
+      .map((m) => ({ name: m.name.trim(), action: m.action })),
+    eventsReported: state.form.events,
+    interventions: state.form.interventions,
+    ades,
+    rphName: state.form.rphName,
+    audit: scoreCall(state).rows.map(({ id, label, done, extra }) => ({ id, label, done, extra })),
+  };
 }

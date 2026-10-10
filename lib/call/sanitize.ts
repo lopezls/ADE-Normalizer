@@ -28,6 +28,14 @@ export function isQuoteOf(quote: string, lineText: string): boolean {
   return q.length > 0 && norm(lineText).includes(q);
 }
 
+/** True when the line says the pharmacist will reach out again AND gives a time for it. */
+export function statesFollowUpTiming(text: string): boolean {
+  const reachOut =
+    /\b(check(ing)? (back|in)|reach(ing)? (back )?out|call(ing)? (you )?(back|again)|follow(ing)? up|contact(ing)? you|touch base|(speak|talk)(ing)? (to you )?(again|soon))\b/i;
+  const when = /\b(day|days|week|weeks|month|months|year|tomorrow|tonight|next|couple|few|soon|later|monday|tuesday|wednesday|thursday|friday)\b/i;
+  return reachOut.test(text) && when.test(text);
+}
+
 export type SanitizeContext = { line: Line; knownEventIds: string[] };
 export type Sanitized = { update: ModelOutput; warnings: string[] };
 
@@ -40,7 +48,7 @@ export function sanitize(raw: RawModelOutput, ctx: SanitizeContext): Sanitized {
   const turn = line.turn;
   const warnings: string[] = [];
   const warn = (m: string) => warnings.push(`Turn ${turn}: ${m}`);
-  const out: ModelOutput = { ...EMPTY_OUTPUT, itemsCompleted: [], events: [], interventions: [] };
+  const out: ModelOutput = { ...EMPTY_OUTPUT, itemsCompleted: [], events: [], interventions: [], medChanges: [] };
   const patient = line.speaker === "patient";
 
   // Free text: trim, cap length, and never let a date of birth through.
@@ -67,6 +75,11 @@ export function sanitize(raw: RawModelOutput, ctx: SanitizeContext): Sanitized {
 
   // Checklist items. The conditional adherence item can only come from the pharmacist.
   for (const id of raw.itemsCompleted) {
+    // The closing step needs a stated follow-up time. The model sometimes counts a plain goodbye.
+    if (id === "S-05" && !statesFollowUpTiming(line.text)) {
+      warn("S-05 was dropped because the line does not say when the pharmacist will reach out again");
+      continue;
+    }
     if (id === "G-01" && patient) {
       warn("G-01 reported on a patient line and was dropped");
       continue;
@@ -84,6 +97,17 @@ export function sanitize(raw: RawModelOutput, ctx: SanitizeContext): Sanitized {
     if (patient) warn("pharmacist name reported on a patient line and was dropped");
     else if (name && isQuoteOf(name, line.text)) out.pharmacistName = name;
     else if (name) warn("pharmacist name was not in the pharmacist's words and was dropped");
+  }
+
+  // Medicines started or stopped come from the patient, and the name must really be in the line.
+  if (raw.medChanges.length > 0) {
+    if (patient) {
+      for (const m of raw.medChanges.slice(0, 5)) {
+        const name = clean(m.name, "medicine name")?.slice(0, 60);
+        if (name && isQuoteOf(name, line.text)) out.medChanges.push({ name, action: m.action });
+        else if (name) warn("a medicine name was not in the patient's words and was dropped");
+      }
+    } else warn("medicine changes reported on a pharmacist line were dropped");
   }
 
   // Drug may be stated by either side.

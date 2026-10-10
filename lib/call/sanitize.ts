@@ -73,6 +73,18 @@ export function sanitize(raw: RawModelOutput, ctx: SanitizeContext): Sanitized {
     }
     if (!out.itemsCompleted.includes(id)) out.itemsCompleted.push(id);
   }
+  // A pharmacist line asking "any questions" always completes S-09. The model sometimes
+  // drops it when the same line also does something else (the closing reminder about the doctor and 911).
+  if (!patient && /\bany (other |more |further )?questions\b/i.test(line.text) && !out.itemsCompleted.includes("S-09"))
+    out.itemsCompleted.push("S-09");
+
+  // The pharmacist's own name comes from a pharmacist line, and must really be in it.
+  if (raw.pharmacistName) {
+    const name = clean(raw.pharmacistName, "pharmacist name")?.slice(0, 60);
+    if (patient) warn("pharmacist name reported on a patient line and was dropped");
+    else if (name && isQuoteOf(name, line.text)) out.pharmacistName = name;
+    else if (name) warn("pharmacist name was not in the pharmacist's words and was dropped");
+  }
 
   // Drug may be stated by either side.
   if (raw.drug && (raw.drug.name || raw.drug.strength || raw.drug.frequency)) {
@@ -83,14 +95,7 @@ export function sanitize(raw: RawModelOutput, ctx: SanitizeContext): Sanitized {
     };
   }
 
-  // Consent, missed dose, events and the ER answer come from the patient only.
-  if (raw.consent) {
-    if (patient) {
-      out.consent = raw.consent;
-      // Any consent answer, including "no contact", completes the consent step.
-      if (!out.itemsCompleted.includes("S-04")) out.itemsCompleted.push("S-04");
-    } else warn("consent reported on a pharmacist line and was dropped");
-  }
+  // Missed dose, events and the ER answer come from the patient only.
   if (raw.missedDose) {
     if (patient) {
       const whichDose = clean(raw.missedDose.whichDose, "missed dose");

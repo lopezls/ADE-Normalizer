@@ -171,14 +171,53 @@
       }
     },
     {
-      "id": "S-04",
+      "id": "S-11",
       "kind": "call-step",
       "drug": null,
       "triggerPhrases": [],
-      "label": "Manufacturer reporting and consent",
+      "label": "Review medication directions (SIG)",
       "recommendation": null,
       "contactPhysicianWhen": null,
-      "description": "Explain that side effects and product complaints are reported to the manufacturer, and ask whether they may contact the patient, the doctor, both, or neither if they have follow-up questions",
+      "description": "Review the directions for use with the patient: dose, route, and how often",
+      "source": {
+        "name": "Standard practice (demo)"
+      }
+    },
+    {
+      "id": "S-08",
+      "kind": "call-step",
+      "drug": null,
+      "triggerPhrases": [],
+      "label": "Ask about medication list changes",
+      "recommendation": null,
+      "contactPhysicianWhen": null,
+      "description": "Ask whether anything on the patient's medication list has changed",
+      "source": {
+        "name": "Standard practice (demo)"
+      }
+    },
+    {
+      "id": "S-10",
+      "kind": "call-step",
+      "drug": null,
+      "triggerPhrases": [],
+      "label": "Ask about barriers to administration",
+      "recommendation": null,
+      "contactPhysicianWhen": null,
+      "description": "Ask whether the patient has any barriers or difficulty giving the medication (injection technique, cost, access, storage, refills)",
+      "source": {
+        "name": "Standard practice (demo)"
+      }
+    },
+    {
+      "id": "S-07",
+      "kind": "call-step",
+      "drug": null,
+      "triggerPhrases": [],
+      "label": "Ask about missed doses",
+      "recommendation": null,
+      "contactPhysicianWhen": null,
+      "description": "Ask whether the patient has missed any doses recently",
       "source": {
         "name": "Standard practice (demo)"
       }
@@ -188,10 +227,23 @@
       "kind": "call-step",
       "drug": null,
       "triggerPhrases": [],
-      "label": "Closing reminder",
+      "label": "Closing: follow-up timeline",
       "recommendation": null,
       "contactPhysicianWhen": null,
-      "description": "Tell the doctor about any side effects; call 911 for a serious emergency",
+      "description": "Tell the patient when you will reach out again, and to call us if they have any questions",
+      "source": {
+        "name": "Standard practice (demo)"
+      }
+    },
+    {
+      "id": "S-09",
+      "kind": "call-step",
+      "drug": null,
+      "triggerPhrases": [],
+      "label": "Ask if the patient has any questions",
+      "recommendation": null,
+      "contactPhysicianWhen": null,
+      "description": "Ask whether the patient has any questions before ending the call",
       "source": {
         "name": "Standard practice (demo)"
       }

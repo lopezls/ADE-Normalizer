@@ -34,17 +34,17 @@
     {
       "turn": 6,
       "speaker": "pharmacist",
-      "text": "Thank you for confirming that. You're currently taking Dupixent, one 300 mg injection under the skin every 2 weeks. We like to check in and see how you're doing and whether you've had any side effects or any other issues. If you report any side effects or product complaints, we report them to the manufacturer. If they have follow-up questions, would it be alright if they contacted you or your doctor?"
+      "text": "Thank you for confirming that. Let's review your directions: you take one 300 mg Dupixent injection under the skin every 2 weeks. Have there been any changes to your medication list, and do you have any barriers to giving your injection?"
     },
     {
       "turn": 7,
       "speaker": "patient",
-      "text": "They can contact my doctor, not me."
+      "text": "No changes, and no problems giving it."
     },
     {
       "turn": 8,
       "speaker": "pharmacist",
-      "text": "No problem, I'll note that. Have you had any side effects or missed any doses?"
+      "text": "Okay, thanks. Have you had any side effects or missed any doses?"
     },
     {
       "turn": 9,
@@ -94,12 +94,12 @@
     {
       "turn": 18,
       "speaker": "pharmacist",
-      "text": "Good to hear. Remember to tell your doctor about any side effects, and call 911 if you ever have a serious emergency. Is there anything else I can help with?"
+      "text": "Good to hear. Remember to tell your doctor about any side effects, and call 911 if you ever have a serious emergency. Do you have any questions for me?"
     },
     {
       "turn": 19,
       "speaker": "patient",
-      "text": "No, that's all. Thank you."
+      "text": "No, I don't have any questions. Thank you."
     },
     {
       "turn": 20,

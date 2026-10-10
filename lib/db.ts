@@ -36,6 +36,10 @@ export function ensureSchema() {
       )`;
     // Added after first deploy; existing rows get ''.
     await sql`ALTER TABLE encounters ADD COLUMN IF NOT EXISTS ades TEXT NOT NULL DEFAULT ''`;
+    // Audit data: who made the call, how it scored, and which steps were covered or missed.
+    await sql`ALTER TABLE encounters ADD COLUMN IF NOT EXISTS rph_name TEXT NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE encounters ADD COLUMN IF NOT EXISTS score_percent INTEGER`;
+    await sql`ALTER TABLE encounters ADD COLUMN IF NOT EXISTS audit JSONB`;
     // Call-screen encounters have no patient ID (stage 1 never asks for one).
     await sql`ALTER TABLE encounters ALTER COLUMN patient_id DROP NOT NULL`;
   })().catch((e) => {

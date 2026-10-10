@@ -5,6 +5,7 @@ import {
   EMPTY_OUTPUT,
   ITEM_IDS,
   type CallState,
+  type MedChange,
   type EventRecord,
   type FormField,
   type ItemId,
@@ -17,6 +18,9 @@ export type CallAction =
   | { type: "hear"; line: Line }
   | { type: "apply"; turn: number; update: Partial<ModelOutput>; warnings?: string[] }
   | { type: "relabel"; turn: number; speaker: Line["speaker"] }
+  | { type: "medAdd"; id: string }
+  | { type: "medEdit"; id: string; patch: Partial<Pick<MedChange, "name" | "action">> }
+  | { type: "medRemove"; id: string }
   | { type: "edit"; field: FormField; value: string }
   | { type: "confirmSeriousness"; value: boolean }
   | { type: "end" }
@@ -28,13 +32,13 @@ export function initialState(setup: { drug: string; indication: string }): CallS
     ended: false,
     checklist: Object.fromEntries(ITEM_IDS.map((id) => [id, { done: false }])) as CallState["checklist"],
     form: {
+      rphName: "",
       drug: setup.drug,
       indication: setup.indication,
       therapyStart: "",
       medChanges: "no",
       events: "",
       interventions: "",
-      consent: "",
       missedDose: "",
       erOrHospital: "",
       seriousness: "",
@@ -42,6 +46,7 @@ export function initialState(setup: { drug: string; indication: string }): CallS
     edited: {},
     aiFilled: {},
     drugDetail: "",
+    medChangeList: [],
     events: [],
     missedDose: null,
     interventions: [],
@@ -100,6 +105,9 @@ function applyUpdate(s: CallState, turn: number, u: ModelOutput): CallState {
     if (!next.matched.some((m) => m.ruleId === ruleId)) next.matched.push({ ruleId, turn });
   };
 
+  // Pharmacist name: the first introduction wins, unless the pharmacist already typed one.
+  if (u.pharmacistName && !next.form.rphName) aiSet("rphName", u.pharmacistName);
+
   // Drug
   if (u.drug?.name) {
     if ((DRUGS as string[]).includes(u.drug.name)) aiSet("drug", u.drug.name);
@@ -107,9 +115,6 @@ function applyUpdate(s: CallState, turn: number, u: ModelOutput): CallState {
   }
   if (u.drug && (u.drug.strength || u.drug.frequency))
     next.drugDetail = [u.drug.strength, u.drug.frequency].filter(Boolean).join(", ");
-
-  // Consent
-  if (u.consent) aiSet("consent", u.consent);
 
   // Missed dose. Code (not the model) turns this into D1-MD and the conditional item G-01.
   if (u.missedDose && !s.missedDose) {
@@ -191,6 +196,12 @@ export function callReducer(s: CallState, a: CallAction): CallState {
     }
     case "relabel":
       return { ...s, transcript: s.transcript.map((l) => (l.turn === a.turn ? { ...l, speaker: a.speaker } : l)) };
+    case "medAdd":
+      return { ...s, medChangeList: [...s.medChangeList, { id: a.id, name: "", action: "started" }] };
+    case "medEdit":
+      return { ...s, medChangeList: s.medChangeList.map((m) => (m.id === a.id ? { ...m, ...a.patch } : m)) };
+    case "medRemove":
+      return { ...s, medChangeList: s.medChangeList.filter((m) => m.id !== a.id) };
     case "edit":
       return {
         ...s,

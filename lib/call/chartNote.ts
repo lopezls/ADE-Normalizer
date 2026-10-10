@@ -1,18 +1,21 @@
 import { itemLabel } from "./checklist";
 import { ITEM_IDS, type CallState, type ItemId } from "./types";
 
-const CONSENT: Record<string, string> = {
-  patient: "contact patient",
-  doctor: "contact doctor only",
-  either: "contact either patient or doctor",
-  none: "no contact",
-};
 const ER: Record<string, string> = {
   none: "No ER visit or hospitalization reported.",
   er: "Patient reported an ER visit.",
   hospitalized: "Patient reported hospitalization.",
   unclear: "ER / hospitalization answer unclear.",
 };
+
+/** "no changes", or each medicine the pharmacist entered as started or stopped. */
+export function medListNote(s: Pick<CallState, "form" | "medChangeList">): string {
+  if (s.form.medChanges !== "yes") return "No changes reported.";
+  const named = s.medChangeList.filter((m) => m.name.trim());
+  return named.length
+    ? `Changes reported: ${named.map((m) => `${m.name.trim()} (${m.action})`).join("; ")}.`
+    : "Changes reported (medicines not entered).";
+}
 
 /** Fixed template, no model call: the same state always gives the same note. */
 export function buildChartNote(s: CallState): string {
@@ -27,7 +30,7 @@ export function buildChartNote(s: CallState): string {
   const drug = [s.form.drug, s.drugDetail].filter(Boolean).join(", ");
   parts.push(`Drug: ${drug || "Not documented"}${s.form.indication ? ` (${s.form.indication})` : ""}.`);
 
-  parts.push(`Consent: ${s.form.consent ? CONSENT[s.form.consent] : "Not documented"}.`);
+  parts.push(`Medication list: ${medListNote(s)}`);
 
   if (s.form.events.trim()) {
     const labels = s.events.map((e) => e.label ?? "no rule matched; pharmacist to assess");

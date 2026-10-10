@@ -21,6 +21,10 @@ describe("Demo Call 1 replay vs 'What the tool should do'", () => {
     expect(done(play(1), "S-01")).toBe(true);
   });
 
+  it("turn 1: the pharmacist's name is filled in", () => {
+    expect(play(1).form.rphName).toBe("Alex");
+  });
+
   it("turn 3: recording disclosure checked", () => {
     expect(done(play(3), "S-02")).toBe(true);
   });
@@ -33,14 +37,18 @@ describe("Demo Call 1 replay vs 'What the tool should do'", () => {
     expect(buildChartNote(s)).not.toMatch(/2002|January/i);
   });
 
-  it("turns 6-7: drug recorded, consent only after the patient answers", () => {
+  it("turn 6: drug recorded as Dupixent, 300 mg every 2 weeks; medication list question checked", () => {
     const at6 = play(6);
+    expect(done(at6, "S-11")).toBe(true);
+    expect(done(at6, "S-08")).toBe(true);
+    expect(done(at6, "S-10")).toBe(true);
     expect(at6.form.drug).toBe("Dupixent");
     expect(at6.drugDetail).toBe("300 mg, every 2 weeks");
-    expect(done(at6, "S-04")).toBe(false);
-    const at7 = play(7);
-    expect(done(at7, "S-04")).toBe(true);
-    expect(at7.form.consent).toBe("doctor");
+  });
+
+  it("turn 8: asking about missed doses is checked", () => {
+    expect(done(play(7), "S-07")).toBe(false);
+    expect(done(play(8), "S-07")).toBe(true);
   });
 
   it("turn 9: missed dose, verbatim event, rules D1-01 and D1-MD, G-01 added red", () => {
@@ -82,18 +90,20 @@ describe("Demo Call 1 replay vs 'What the tool should do'", () => {
     expect(s.seriousnessIsDefault).toBe(true);
   });
 
-  it("turn 18: closing reminder checked", () => {
-    expect(done(play(18), "S-05")).toBe(true);
+  it("turn 18: 'any questions' checked; the 911 reminder alone does not finish the closing step", () => {
+    expect(done(play(17), "S-09")).toBe(false);
+    expect(done(play(18), "S-09")).toBe(true);
+    expect(done(play(18), "S-05")).toBe(false);
+    expect(done(play(20), "S-05")).toBe(true);
   });
 
   it("end: all required steps done, adherence flagged as not covered", () => {
     const s = play(20);
-    for (const id of ["S-01", "S-02", "S-03", "S-04", "S-05", "S-06"]) expect(done(s, id)).toBe(true);
+    for (const id of ["S-01", "S-02", "S-03", "S-11", "S-08", "S-10", "S-07", "S-06", "S-05", "S-09"]) expect(done(s, id)).toBe(true);
     expect(done(s, "G-01")).toBe(false);
     const note = buildChartNote(s);
     expect(note).toContain("Adherence support (alarms, pill boxes, calendars) not covered");
     expect(note).toContain("Non-serious (default; pending pharmacist confirmation)");
-    expect(note).toContain("contact doctor only");
     expect(note).toContain("Standardized: Diarrhea");
   });
 });

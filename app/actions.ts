@@ -3,16 +3,22 @@
 import { ensureSchema, getSql } from "@/lib/db";
 import { isValidPair } from "@/lib/drugs";
 import { medListStatus, parseAdes } from "@/lib/encounter";
+import { percentOf, type AuditRow } from "@/lib/call/score";
 
 export type CallEncounterInput = {
   drugName: string;
   indication: string;
   therapyStart: string;
   medChanges: boolean;
+  /** Medicines started or stopped; only used when medChanges is true. */
+  medChangeList: { name: string; action: "started" | "stopped" }[];
   eventsReported: string;
   interventions: string;
   /** Pharmacist-reviewed standard terms, one per ADE. */
   ades: string[];
+  rphName: string;
+  /** Every scored step of the call and whether it was covered. The percentage is recomputed here. */
+  audit: AuditRow[];
 };
 
 export type SaveCallState =
@@ -30,6 +36,29 @@ export async function saveCallEncounter(input: CallEncounterInput): Promise<Save
     ? input.ades.slice(0, 20).map((a) => String(a).trim().slice(0, 100).replace(/-/g, " "))
     : [];
 
+  const meds = (Array.isArray(input.medChangeList) ? input.medChangeList : [])
+    .slice(0, 20)
+    .map((m) => ({
+      name: String(m.name ?? "").trim().slice(0, 100),
+      action: m.action === "stopped" ? "stopped" : "started",
+    }))
+    .filter((m) => m.name);
+  // Stored in med_changes_details: "confirmed", or "updated: Name (started); ..."
+  const medDetails = input.medChanges
+    ? meds.length
+      ? `updated: ${meds.map((m) => `${m.name} (${m.action})`).join("; ")}`
+      : medListStatus(true)
+    : medListStatus(false);
+
+  const rphName = String(input.rphName ?? "").trim().slice(0, 60);
+  const audit: AuditRow[] = (Array.isArray(input.audit) ? input.audit : []).slice(0, 30).map((r) => ({
+    id: String(r.id ?? "").slice(0, 10),
+    label: String(r.label ?? "").slice(0, 120),
+    done: r.done === true,
+    extra: r.extra === true,
+  }));
+  const scorePercent = audit.length ? percentOf(audit) : null;
+
   if (!isValidPair(drugName, indication))
     return { status: "error", message: "Select a valid drug and indication on the form first." };
   if (therapyStart && !/^\d{4}-\d{2}-\d{2}$/.test(therapyStart))
@@ -41,11 +70,13 @@ export async function saveCallEncounter(input: CallEncounterInput): Promise<Save
     const inserted = await sql`
       INSERT INTO encounters
         (patient_id, drug_name, therapy_start, indication, med_changes,
-         med_changes_details, events_reported, ades, interventions)
+         med_changes_details, events_reported, ades, interventions,
+         rph_name, score_percent, audit)
       VALUES
         (NULL, ${drugName}, ${therapyStart || null}, ${indication}, ${!!input.medChanges},
-         ${medListStatus(!!input.medChanges)}, ${eventsReported},
-         ${parseAdes(terms.join("\n"))}, ${interventions})
+         ${medDetails}, ${eventsReported},
+         ${parseAdes(terms.join("\n"))}, ${interventions},
+         ${rphName}, ${scorePercent}, ${audit.length ? JSON.stringify(audit) : null}::jsonb)
       RETURNING id`;
     return { status: "success", encounterNumber: inserted[0].id as number };
   } catch (err) {

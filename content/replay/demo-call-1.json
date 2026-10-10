@@ -2,11 +2,11 @@
   "scriptId": "demo-call-1",
   "note": "Hand-written to match the 'What the tool should do' table in docs/Demo-Call.md. Replaced by outputs recorded from the real model in step 7. Turns not listed have nothing to report.",
   "turns": {
-    "1": { "itemsCompleted": ["S-01"] },
+    "1": { "itemsCompleted": ["S-01"], "pharmacistName": "Alex" },
     "3": { "itemsCompleted": ["S-02"] },
     "5": { "itemsCompleted": ["S-03"] },
-    "6": { "drug": { "name": "Dupixent", "strength": "300 mg", "frequency": "every 2 weeks" } },
-    "7": { "itemsCompleted": ["S-04"], "consent": "doctor" },
+    "6": { "itemsCompleted": ["S-11", "S-08", "S-10"], "drug": { "name": "Dupixent", "strength": "300 mg", "frequency": "every 2 weeks" } },
+    "8": { "itemsCompleted": ["S-07"] },
     "9": {
       "missedDose": {
         "whichDose": "Last night's dose",
@@ -29,6 +29,7 @@
     },
     "16": { "itemsCompleted": ["S-06"] },
     "17": { "erOrHospital": "none" },
-    "18": { "itemsCompleted": ["S-05"] }
+    "18": { "itemsCompleted": ["S-09"] },
+    "20": { "itemsCompleted": ["S-05"] }
   }
 }

@@ -11,9 +11,9 @@
 3. **Pharmacist:** Great, and just so you know, this call is being recorded.
 4. **Pharmacist:** Before we continue, can you confirm your date of birth for privacy?
 5. **Patient:** Sure, it's January 1st, 2002.
-6. **Pharmacist:** Thank you for confirming that. You're currently taking Dupixent, one 300 mg injection under the skin every 2 weeks. We like to check in and see how you're doing and whether you've had any side effects or any other issues. If you report any side effects or product complaints, we report them to the manufacturer. If they have follow-up questions, would it be alright if they contacted you or your doctor?
-7. **Patient:** They can contact my doctor, not me.
-8. **Pharmacist:** No problem, I'll note that. Have you had any side effects or missed any doses?
+6. **Pharmacist:** Thank you for confirming that. Let's review your directions: you take one 300 mg Dupixent injection under the skin every 2 weeks. Have there been any changes to your medication list, and do you have any barriers to giving your injection?
+7. **Patient:** No changes, and no problems giving it.
+8. **Pharmacist:** Okay, thanks. Have you had any side effects or missed any doses?
 9. **Patient:** Yes, I missed last night's dose. I usually take my shot on Friday every other week, but last night I got out of work late. I've also had some diarrhea.
 10. **Pharmacist:** I'm sorry to hear that. Working late is understandable. How long has the diarrhea been going on?
 11. **Patient:** About a day, just today and yesterday.
@@ -23,8 +23,8 @@
 15. **Patient:** Okay, that makes sense.
 16. **Pharmacist:** Have you been to the ER or hospital recently?
 17. **Patient:** Nope.
-18. **Pharmacist:** Good to hear. Remember to tell your doctor about any side effects, and call 911 if you ever have a serious emergency. Is there anything else I can help with?
-19. **Patient:** No, that's all. Thank you.
+18. **Pharmacist:** Good to hear. Remember to tell your doctor about any side effects, and call 911 if you ever have a serious emergency. Do you have any questions for me?
+19. **Patient:** No, I don't have any questions. Thank you.
 20. **Pharmacist:** Thank you so much for speaking with me today. We'll check back in a couple of months, but you can always reach out if needed. Have a good day.
 
 ## What the tool should do
@@ -34,17 +34,19 @@
 | 1 | Self-identify: checked |
 | 3 | Recording disclosure: checked |
 | 4-5 | Identity verification: checked (date of birth is not stored) |
-| 6-7 | Drug recorded as Dupixent, 300 mg every 2 weeks; consent checked and recorded as "contact doctor only" |
+| 6 | Drug recorded as Dupixent, 300 mg every 2 weeks. Directions (SIG) reviewed, ask about medication list changes and barriers to administration: all checked |
+| 8 | Ask about missed doses: checked |
 | 9 | Missed dose captured, with the patient's reason (got out of work late) and schedule (every other week, usually Fridays). Event captured with verbatim wording ("I've also had some diarrhea") and standardized label "Diarrhea." Rules D1-01 and D1-MD appear in the right side panel with their rule IDs. The patient's stated schedule tells the tool to use the every-other-week missed-dose rule. Because a missed dose was reported, "Offer adherence tips (alarms, pill boxes, calendars)" is added to the checklist as a pending item |
 | 10-13 | Duration recorded (about 1 day); treatments tried: none |
 | 14 | Pharmacist's actual guidance documented as the intervention. No adherence suggestion is detected, so the pending item stays unchecked |
 | 16-17 | ER visit or hospitalization: none reported |
-| 18 | Closing reminder: checked |
+| 18 | "Any questions" asked: checked |
+| 20 | Closing: follow-up timeline given and told to reach out with questions: checked |
 | End | Chart note generated for pharmacist review. The adherence item is flagged as not covered. No serious outcome was identified, so the event is recorded as non-serious |
 
 ## Expected chart note (sample)
 
-**Call steps:** Self-identified, recording disclosed, identity verified (using date of birth), consent obtained (contact doctor only), closing reminder given.
+**Call steps:** Self-identified, recording disclosed, identity verified (using date of birth), reviewed directions (SIG), asked about medication list changes, barriers to administration and missed doses, closing timeline given, asked about questions.
 
 **Drug:** Dupixent 300 mg pen, every 2 weeks (patient usually injects on Fridays).
 

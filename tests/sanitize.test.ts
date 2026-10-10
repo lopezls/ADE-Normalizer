@@ -7,7 +7,7 @@ import { RULES } from "../lib/call/rules";
 
 const line = (turn: number) => DEMO_CALL_1.lines[turn - 1];
 const empty: RawModelOutput = {
-  itemsCompleted: [], drug: null, consent: null, missedDose: null,
+  itemsCompleted: [], drug: null, pharmacistName: null, missedDose: null,
   events: [], erOrHospital: null, interventions: [],
 };
 const ctx = (turn: number, knownEventIds: string[] = []) => ({ line: line(turn), knownEventIds });
@@ -68,12 +68,11 @@ describe("sanitize: other fields", () => {
     expect(sanitize({ ...empty, interventions: iv }, ctx(14)).update.interventions).toHaveLength(1);
   });
 
-  it("ignores consent, missed dose and ER answers on a pharmacist line", () => {
+  it("ignores missed dose and ER answers on a pharmacist line", () => {
     const { update } = sanitize(
-      { ...empty, consent: "doctor", erOrHospital: "none", missedDose: { whichDose: "x", reason: null, schedule: null } },
+      { ...empty, erOrHospital: "none", missedDose: { whichDose: "x", reason: null, schedule: null } },
       ctx(6),
     );
-    expect(update.consent).toBeNull();
     expect(update.erOrHospital).toBeNull();
     expect(update.missedDose).toBeNull();
   });
@@ -98,7 +97,7 @@ describe("sanitize: other fields", () => {
 describe("request guard (stage-1 script allowlist)", () => {
   const base = (over = {}) => ({
     scriptId: "demo-call-1", line: line(9), recent: [line(7), line(8)],
-    state: { doneItems: [], missedDoseReported: false, consent: "", erOrHospital: "", events: [] },
+    state: { doneItems: [], missedDoseReported: false, erOrHospital: "", events: [] },
     ...over,
   });
 
@@ -140,14 +139,13 @@ describe("prompt", () => {
   });
 });
 
-describe("consent completes S-04 in code", () => {
-  it("adds S-04 when the patient gives any consent answer, even 'none'", () => {
-    const { update } = sanitize({ ...empty, consent: "none" }, ctx(7));
-    expect(update.consent).toBe("none");
-    expect(update.itemsCompleted).toContain("S-04");
+describe("asking for questions completes S-09 in code", () => {
+  it("adds S-09 on a pharmacist line that asks about questions", () => {
+    const { update } = sanitize({ ...empty }, { line: { turn: 18, speaker: "pharmacist" as const, text: "Remember to call 911 in an emergency. Do you have any questions for me?" }, knownEventIds: [] });
+    expect(update.itemsCompleted).toContain("S-09");
   });
-  it("does not add S-04 when consent came from a pharmacist line", () => {
-    const { update } = sanitize({ ...empty, consent: "doctor" }, ctx(6));
-    expect(update.itemsCompleted).not.toContain("S-04");
+  it("does not add S-09 on a patient line", () => {
+    const { update } = sanitize({ ...empty }, { line: { turn: 19, speaker: "patient" as const, text: "I don't have any questions." }, knownEventIds: [] });
+    expect(update.itemsCompleted).not.toContain("S-09");
   });
 });

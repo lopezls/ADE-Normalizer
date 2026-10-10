@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { saveCallEncounter } from "@/app/actions";
 import { cleanTerm, initialRows, type AdeRow } from "@/lib/call/ades";
 import { buildChartNote } from "@/lib/call/chartNote";
+import { scoreCall } from "@/lib/call/score";
 import { normalizeRemote } from "@/lib/call/client";
 import type { CallState } from "@/lib/call/types";
 
@@ -94,9 +95,12 @@ export default function SubmitDialog({ state, open, useAi, live, onClose, onConf
         indication: state.form.indication,
         therapyStart: state.form.therapyStart,
         medChanges: state.form.medChanges === "yes",
+        medChangeList: state.medChangeList.filter((m) => m.name.trim()).map((m) => ({ name: m.name.trim(), action: m.action })),
         eventsReported: state.form.events,
         interventions: state.form.interventions,
         ades: rows.map((r) => r.term.trim()).filter(Boolean),
+        rphName: state.form.rphName,
+        audit: scoreCall(state).rows.map(({ id, label, done, extra }) => ({ id, label, done, extra })),
       });
       if (res.status === "success") setSavedAs(res.encounterNumber);
       else setError(res.message);

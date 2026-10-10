@@ -45,3 +45,57 @@ export async function getDrugStats(): Promise<DrugStats[]> {
     };
   });
 }
+
+export type MissedStep = { id: string; label: string; missed: number; applicable: number };
+export type RphStat = { name: string; calls: number; avgPercent: number };
+export type AuditStats = {
+  calls: number;
+  avgPercent: number;
+  byRph: RphStat[];
+  /** Steps ranked by how often they were missed (only steps missed at least once). */
+  missed: MissedStep[];
+};
+
+type StoredStep = { id: string; label: string; done: boolean };
+
+/** Pure part: turns stored call rows into the audit summary. */
+export function summarizeAudit(
+  rows: { rph_name: string; score_percent: number; audit: StoredStep[] | null }[],
+): AuditStats {
+  const byRph = new Map<string, { sum: number; n: number }>();
+  const steps = new Map<string, MissedStep>();
+  let sum = 0;
+
+  for (const r of rows) {
+    sum += r.score_percent;
+    const name = r.rph_name.trim() || "(name not recorded)";
+    const p = byRph.get(name) ?? { sum: 0, n: 0 };
+    byRph.set(name, { sum: p.sum + r.score_percent, n: p.n + 1 });
+
+    for (const step of r.audit ?? []) {
+      const s = steps.get(step.id) ?? { id: step.id, label: step.label, missed: 0, applicable: 0 };
+      s.applicable += 1;
+      if (!step.done) s.missed += 1;
+      steps.set(step.id, s);
+    }
+  }
+
+  return {
+    calls: rows.length,
+    avgPercent: rows.length ? Math.round(sum / rows.length) : 0,
+    byRph: [...byRph]
+      .map(([name, v]) => ({ name, calls: v.n, avgPercent: Math.round(v.sum / v.n) }))
+      .sort((a, b) => b.calls - a.calls || a.name.localeCompare(b.name)),
+    missed: [...steps.values()]
+      .filter((s) => s.missed > 0)
+      .sort((a, b) => b.missed - a.missed || b.missed / b.applicable - a.missed / a.applicable),
+  };
+}
+
+export async function getAuditStats(): Promise<AuditStats> {
+  await ensureSchema();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT rph_name, score_percent, audit FROM encounters WHERE score_percent IS NOT NULL`;
+  return summarizeAudit(rows as { rph_name: string; score_percent: number; audit: StoredStep[] | null }[]);
+}

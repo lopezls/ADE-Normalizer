@@ -12,6 +12,7 @@ import { roleFor, type RawTurn } from "@/lib/call/turns";
 import ChecklistPanel from "./ChecklistPanel";
 import EncounterPanel from "./EncounterPanel";
 import RecommendationsPanel from "./RecommendationsPanel";
+import ScorePanel from "./ScorePanel";
 import SubmitDialog from "./SubmitDialog";
 import TranscriptStrip from "./TranscriptStrip";
 
@@ -393,15 +394,26 @@ export default function CallScreen() {
             state={state}
             onEdit={(field, value) => dispatch({ type: "edit", field, value })}
             onSubmit={() => setSubmitOpen(true)}
+            onMed={dispatch}
           />
-          <TranscriptStrip transcript={state.transcript} status={lineStatus}
+          {isMic && micOn && (
+            <section
+              aria-label="Live transcription"
+              className="rounded-2xl border border-zinc-200 bg-white p-4 text-zinc-900 dark:border-zinc-700 dark:bg-white dark:text-zinc-900"
+            >
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                Live transcription
+              </h2>
+              <p className="mt-1 min-h-6 text-base" aria-live="off">
+                {interim || <span className="text-zinc-400">Listening…</span>}
+              </p>
+            </section>
+          )}
+          <TranscriptStrip
+            transcript={state.transcript}
+            status={lineStatus}
             onFlip={isMic && !state.ended ? flipSpeaker : undefined}
           />
-          {isMic && interim && (
-            <p className="px-2 text-xs italic text-zinc-500" aria-hidden>
-              Hearing: {interim}
-            </p>
-          )}
           {state.warnings.length > 0 && (
             <details className="rounded-2xl border border-zinc-200 bg-white p-3 text-xs dark:border-zinc-800 dark:bg-zinc-900">
               <summary className="cursor-pointer font-medium text-zinc-600 dark:text-zinc-400">
@@ -416,7 +428,10 @@ export default function CallScreen() {
             </details>
           )}
         </div>
-        <RecommendationsPanel rules={rules} />
+        <div className="space-y-4">
+          <RecommendationsPanel rules={rules} />
+          <ScorePanel state={state} />
+        </div>
       </div>
 
       {state.ended && (

@@ -1,6 +1,7 @@
 "use client";
 
 import { DRUGS, DRUG_INDICATIONS, type DrugName } from "@/lib/drugs";
+import type { CallAction } from "@/lib/call/reducer";
 import type { CallState, FormField } from "@/lib/call/types";
 
 const field =
@@ -12,6 +13,8 @@ type Props = {
   onEdit: (field: FormField, value: string) => void;
   /** Opens the review dialog. The button only shows after End call. */
   onSubmit: () => void;
+  /** Medication list entries (name, started or stopped). */
+  onMed: (action: CallAction) => void;
 };
 
 function Badge({ text, tone }: { text: string; tone: "ai" | "you" | "rule" }) {
@@ -23,7 +26,7 @@ function Badge({ text, tone }: { text: string; tone: "ai" | "you" | "rule" }) {
   return <span className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${cls}`}>{text}</span>;
 }
 
-export default function EncounterPanel({ state, onEdit, onSubmit }: Props) {
+export default function EncounterPanel({ state, onEdit, onSubmit, onMed }: Props) {
   const { form } = state;
 
   const badge = (k: FormField) => {
@@ -60,6 +63,10 @@ export default function EncounterPanel({ state, onEdit, onSubmit }: Props) {
       </p>
 
       <div aria-live="polite" className="space-y-4">
+        {row("rphName", "rphName", "RPH name",
+          <input id="rphName" className={field} value={form.rphName} placeholder="Filled in when the pharmacist introduces themself"
+            onChange={(e) => onEdit("rphName", e.target.value)} />)}
+
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             {row("drug", "drug", "Drug name",
@@ -93,11 +100,59 @@ export default function EncounterPanel({ state, onEdit, onSubmit }: Props) {
               <label key={v} className="flex items-center gap-2">
                 <input type="radio" name="medChanges" value={v}
                   checked={form.medChanges === v}
-                  onChange={() => onEdit("medChanges", v)} />
+                  onChange={() => {
+                    onEdit("medChanges", v);
+                    // Saying yes opens one empty row to fill in.
+                    if (v === "yes" && state.medChangeList.length === 0)
+                      onMed({ type: "medAdd", id: crypto.randomUUID() });
+                  }} />
                 {v === "yes" ? "Yes" : "No"}
               </label>
             ))}
           </div>
+          {form.medChanges === "yes" && (
+            <div className="mt-3 space-y-2 rounded-xl bg-lime-50 p-3 dark:bg-zinc-800">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                Which medicine was started or stopped?
+              </p>
+              {state.medChangeList.map((m) => (
+                <div key={m.id} className="flex flex-wrap items-center gap-2">
+                  <input
+                    aria-label="Medication name"
+                    placeholder="Medication name"
+                    className={`${field} min-w-40 flex-1`}
+                    value={m.name}
+                    onChange={(e) => onMed({ type: "medEdit", id: m.id, patch: { name: e.target.value } })}
+                  />
+                  <select
+                    aria-label="Started or stopped"
+                    className={`${field} w-auto`}
+                    value={m.action}
+                    onChange={(e) =>
+                      onMed({ type: "medEdit", id: m.id, patch: { action: e.target.value as "started" | "stopped" } })
+                    }
+                  >
+                    <option value="started">Started</option>
+                    <option value="stopped">Stopped</option>
+                  </select>
+                  <button
+                    type="button"
+                    className="rounded-full px-2 py-1 text-xs font-medium text-zinc-600 hover:bg-lime-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                    onClick={() => onMed({ type: "medRemove", id: m.id })}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                className="rounded-full bg-lime-100 px-3 py-1.5 text-xs font-medium text-zinc-900 hover:bg-lime-200 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600"
+                onClick={() => onMed({ type: "medAdd", id: crypto.randomUUID() })}
+              >
+                + Add another medication
+              </button>
+            </div>
+          )}
         </fieldset>
 
         {row("events", "events", "Events reported by patient",
@@ -131,16 +186,7 @@ export default function EncounterPanel({ state, onEdit, onSubmit }: Props) {
         <hr className="border-zinc-200 dark:border-zinc-800" />
         <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Call details</p>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          {row("consent", "consent", "Follow-up contact consent",
-            <select id="consent" className={field} value={form.consent}
-              onChange={(e) => onEdit("consent", e.target.value)}>
-              <option value="">Not captured</option>
-              <option value="patient">Contact patient</option>
-              <option value="doctor">Contact doctor only</option>
-              <option value="either">Contact either</option>
-              <option value="none">No contact</option>
-            </select>)}
+        <div>
           {row("erOrHospital", "er", "ER visit or hospitalization",
             <select id="er" className={field} value={form.erOrHospital}
               onChange={(e) => onEdit("erOrHospital", e.target.value)}>

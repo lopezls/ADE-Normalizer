@@ -1,5 +1,5 @@
 // Single-line checks against the REAL model for wording the demo script does not use.
-// Covers: meaning-matching, no-match, patient's own attribution, consent options,
+// Covers: meaning-matching, no-match, patient's own attribution,
 // adherence tips, and a prompt-injection attempt. Run: npm run eval
 import { describe, expect, it } from "vitest";
 import { analyzeLine } from "../../lib/call/analyze";
@@ -7,7 +7,7 @@ import type { CompactState } from "../../lib/call/schema";
 import type { Line } from "../../lib/call/script";
 import type { ModelOutput } from "../../lib/call/types";
 
-const emptyState: CompactState = { doneItems: [], missedDoseReported: false, consent: "", erOrHospital: "", events: [] };
+const emptyState: CompactState = { doneItems: [], missedDoseReported: false, erOrHospital: "", events: [] };
 const P = (turn: number, text: string): Line => ({ turn, speaker: "pharmacist", text });
 const T = (turn: number, text: string): Line => ({ turn, speaker: "patient", text });
 
@@ -20,7 +20,6 @@ type Case = {
 };
 
 const ASK_SIDE_EFFECTS = P(7, "Have you had any side effects or missed any doses?");
-const ASK_CONSENT = P(5, "If they have follow-up questions, would it be alright if they contacted you or your doctor?");
 
 const CASES: Case[] = [
   {
@@ -63,16 +62,58 @@ const CASES: Case[] = [
     ok: (u) => u.events.length === 0 && u.missedDose === null,
   },
   {
-    name: "consent 'either' completes S-04",
-    line: T(6, "Either of you can call me, that's fine."),
-    recent: [ASK_CONSENT],
-    ok: (u) => u.consent === "either" && u.itemsCompleted.includes("S-04"),
+    name: "reviewing the directions completes S-11",
+    line: P(6, "Just to go over how you take it: one pen, 300 milligrams, injected under the skin every other week."),
+    recent: [T(5, "Sure.")],
+    ok: (u) => u.itemsCompleted.includes("S-11"),
   },
   {
-    name: "consent 'none' recorded",
-    line: T(6, "No, please don't contact me or my doctor."),
-    recent: [ASK_CONSENT],
-    ok: (u) => u.consent === "none" && u.itemsCompleted.includes("S-04"),
+    name: "asking about medication changes completes S-08",
+    line: P(6, "Have you started or stopped any medicines recently?"),
+    recent: [T(5, "Sure.")],
+    ok: (u) => u.itemsCompleted.includes("S-08"),
+  },
+  {
+    name: "asking about barriers completes S-10",
+    line: P(6, "Are you having any trouble giving the injection, or any issues with cost or getting refills?"),
+    recent: [T(5, "Sure.")],
+    ok: (u) => u.itemsCompleted.includes("S-10"),
+  },
+  {
+    name: "follow-up timeline and call-us line completes S-05",
+    line: P(20, "We'll reach back out in about two months, and please call us anytime if you have questions."),
+    recent: [T(19, "No, thank you.")],
+    ok: (u) => u.itemsCompleted.includes("S-05"),
+  },
+  {
+    name: "911 reminder alone does not complete S-05",
+    line: P(18, "Remember to tell your doctor about any side effects, and call 911 if you ever have a serious emergency."),
+    recent: [T(17, "Nope.")],
+    ok: (u) => !u.itemsCompleted.includes("S-05"),
+  },
+  {
+    name: "asking if there are questions completes S-09",
+    line: P(18, "Do you have any questions for me today?"),
+    recent: [T(17, "Nope.")],
+    ok: (u) => u.itemsCompleted.includes("S-09"),
+  },
+  {
+    name: "asking about missed doses completes S-07",
+    line: P(8, "Have you missed any doses lately?"),
+    recent: [T(7, "Okay.")],
+    ok: (u) => u.itemsCompleted.includes("S-07"),
+  },
+  {
+    name: "asking about side effects AND missed doses completes S-07",
+    line: P(8, "Have you had any side effects or missed any doses?"),
+    recent: [T(7, "That's fine.")],
+    ok: (u) => u.itemsCompleted.includes("S-07"),
+  },
+  {
+    name: "asking only about side effects does not complete S-07",
+    line: P(8, "Have you had any side effects since we last spoke?"),
+    recent: [T(7, "That's fine.")],
+    ok: (u) => !u.itemsCompleted.includes("S-07"),
   },
   {
     name: "pharmacist offering alarms completes G-01",

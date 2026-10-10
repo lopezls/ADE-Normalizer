@@ -57,8 +57,12 @@ Note: to remain within scope and timeline constraints, we will only construct ru
 | S-01 | Self-identify | State your name, title, and where you're calling from | Standard practice (demo) |
 | S-02 | Recording disclosure | Tell the patient the call is being recorded | Standard practice (demo) |
 | S-03 | Verify patient identity | Confirm the patient's date of birth before discussing any PHI | Standard practice (demo) |
-| S-04 | Manufacturer reporting and consent | Explain that side effects and product complaints are reported to the manufacturer, and ask whether they may contact the patient, the doctor, both, or neither if they have follow-up questions | Standard practice (demo) |
-| S-05 | Closing reminder | Tell the doctor about any side effects; call 911 for a serious emergency | Standard practice (demo) |
+| S-11 | Review medication directions (SIG) | Review the directions for use with the patient: dose, route, and how often | Standard practice (demo) |
+| S-08 | Ask about medication list changes | Ask whether anything on the patient's medication list has changed | Standard practice (demo) |
+| S-10 | Ask about barriers to administration | Ask whether the patient has any barriers or difficulty giving the medication (injection technique, cost, access, storage, refills) | Standard practice (demo) |
+| S-07 | Ask about missed doses | Ask whether the patient has missed any doses recently | Standard practice (demo) |
+| S-05 | Closing: follow-up timeline | Tell the patient when you will reach out again, and to call us if they have any questions | Standard practice (demo) |
+| S-09 | Ask if the patient has any questions | Ask whether the patient has any questions before ending the call | Standard practice (demo) |
 | S-06 | Ask about ER visit / hospitalization | Ask whether the patient has been to the ER or hospital recently (see G-02) | Standard practice (demo) |
 
 ### Dupixent counseling topics (Indication: Asthma)

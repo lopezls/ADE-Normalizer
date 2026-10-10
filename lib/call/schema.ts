@@ -15,7 +15,7 @@ const str = z.string().nullable();
 export const ModelOutputSchema = z.object({
   itemsCompleted: z.array(z.enum(ITEM_IDS)),
   drug: z.object({ name: str, strength: str, frequency: str }).nullable(),
-  consent: z.enum(["patient", "doctor", "either", "none"]).nullable(),
+  pharmacistName: str,
   missedDose: z.object({ whichDose: z.string(), reason: str, schedule: str }).nullable(),
   events: z.array(
     z.object({
@@ -42,7 +42,6 @@ const LineSchema = z.object({
 export const CompactStateSchema = z.object({
   doneItems: z.array(z.enum(ITEM_IDS)).max(10),
   missedDoseReported: z.boolean(),
-  consent: z.string().max(20),
   erOrHospital: z.string().max(20),
   events: z
     .array(z.object({ id: z.string().max(10), verbatim: z.string().max(300), ruleId: z.string().max(10).nullable() }))
